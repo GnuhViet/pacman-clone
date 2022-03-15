@@ -9,4 +9,5 @@
 /.idea
 /pacman.iml
 /out
+.gitignore
 
