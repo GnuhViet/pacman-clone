@@ -7,7 +7,6 @@
 /dataSources/
 /dataSources.local.xml
 /.idea
-pacman.iml
+/pacman.iml
 /out
-.gitignore
 
