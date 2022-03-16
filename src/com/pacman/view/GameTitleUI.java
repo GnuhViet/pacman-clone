@@ -1,19 +1,20 @@
 package com.pacman.view;
 
+import com.pacman.ultis.Constants;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 
 public class GameTitleUI {
     private static final String GAME_TITLE = "PACMAN";
 
-    private static final int SCREEN_WIDTH = 600;
-    private static final int SCREEN_HEIGHT = 750;
 
     private JFrame window;
     private ImagePanel titleUI;
-    private JPanel gameUI;
+    private GameView gameUI;
     private Container con;
 
     public GameTitleUI() {
@@ -24,7 +25,7 @@ public class GameTitleUI {
     private void initFrame() {
         window = new JFrame();
         window.setTitle(GAME_TITLE);
-        window.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+        window.setSize(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT);
         window.setResizable(false);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setLocationRelativeTo(null);
@@ -87,18 +88,6 @@ public class GameTitleUI {
         con.add(titleUI);
     }
 
-    private void initGameUI() {
-
-        titleUI.setVisible(false);
-
-        gameUI = new JPanel();
-        con.add(gameUI);
-
-        Label gameLb = new Label("DAY LA GAME");
-
-        gameUI.add(gameLb);
-        gameLb.setVisible(true);
-    }
 
     // image button
     private class MenuButton extends JLabel implements MouseListener {
@@ -127,7 +116,15 @@ public class GameTitleUI {
         public void mouseClicked(MouseEvent e) {
 
             if (buttonName.equals("StartButton.png")) {
-                initGameUI();
+                titleUI.setVisible(false);
+
+                try {
+                    gameUI = new GameView();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+
+                con.add(gameUI);
                 return;
             }
 
