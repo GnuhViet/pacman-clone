@@ -1,5 +1,6 @@
 package com.pacman.view;
 
+import com.pacman.entity.Pacman;
 import com.pacman.entity.SpriteSheet;
 import com.pacman.ultis.BufferedImageLoader;
 import com.pacman.ultis.Constants;
@@ -7,47 +8,57 @@ import com.pacman.ultis.FileUtils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.io.IOException;
 
-public class GameView extends JPanel {
+public class GameView extends JPanel implements ActionListener, KeyListener{
     private FileUtils data; // TODO... chinh sua lai
     private SpriteSheet mapSprite;;
     private Constants.Cell[][] mapInput;
+    private Pacman pacman;
+    private Timer timer;
 
     public GameView() throws IOException {
         data = new FileUtils();
+        pacman = new Pacman();
         initGame();
     }
 
     private void initGame() throws IOException {
-        mapSprite = new SpriteSheet(BufferedImageLoader.loadImage("src/com/pacman/res/Entity/Map16.png"));
-
-        mapInput = data.getMap(); //TODO .. chinh sua lai
         this.setOpaque(true);
         this.setBackground(Color.BLACK);
-        this.setPreferredSize(new Dimension(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT));
+
+        mapSprite = new SpriteSheet(BufferedImageLoader.loadImage("src/com/pacman/res/Entity/Map16.png"));
+
+        mapInput = data.getMap(pacman); //TODO .. chinh sua lai
+
+        timer = new Timer(200,this); // loop game
+        timer.start();
     }
+
 
     private void drawMap(Graphics2D g2d) throws IOException {
 
         for (int a = 0; a < Constants.MAP_WIDTH; a++){
             for (int b = 0; b < Constants.MAP_HEIGHT; b++) {
 
-                int x_pos = Constants.CELL_SIZE + ((b * Constants.CELL_SIZE) - Constants.CELL_SIZE) * Constants.SCREEN_RESIZE;
+                int x = b + 1;
+                int y = a + 1;
 
-                int y_pos = Constants.FONT_SIZE + Constants.CELL_SIZE * 3 + ((a * Constants.CELL_SIZE) - Constants.CELL_SIZE) * Constants.SCREEN_RESIZE;
+                int xPos = ((x * Constants.CELL_SIZE) - Constants.CELL_SIZE) * Constants.SCREEN_RESIZE;
+                int yPos = Constants.CELL_SIZE * 2 + ((y * Constants.CELL_SIZE) - Constants.CELL_SIZE) * Constants.SCREEN_RESIZE;
 
                 switch (mapInput[a][b]) {
                     case Door: {
-                        g2d.drawImage(mapSprite.grabImage(2,3), x_pos, y_pos, null);
+                        g2d.drawImage(mapSprite.grabImage(1,2),  xPos, yPos, null);
                         break;
                     }
                     case Energizer: {
-                        g2d.drawImage(mapSprite.grabImage(2,2), x_pos, y_pos, null);
+                        g2d.drawImage(mapSprite.grabImage(1,1),  xPos, yPos, null);
                         break;
                     }
                     case Pellet: {
-                        g2d.drawImage(mapSprite.grabImage(2,1), x_pos, y_pos, null);
+                        g2d.drawImage(mapSprite.grabImage(1,0),  xPos, yPos, null);
                         break;
                     }
                     case Wall: {
@@ -81,9 +92,9 @@ public class GameView extends JPanel {
                             }
                         }
 
-                        int pos = (down + 2 * (left + 2 * (right + 2 * up))) + 1;
+                        int pos = (down + 2 * (left + 2 * (right + 2 * up)));
 
-                        g2d.drawImage(mapSprite.grabImage(1, pos), x_pos, y_pos, null);
+                        g2d.drawImage(mapSprite.grabImage(0, pos),  xPos, yPos, null);
                     }
                 }
             }
@@ -95,9 +106,31 @@ public class GameView extends JPanel {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
         try {
-            drawMap(g2d);
+            this.drawMap(g2d);
+            pacman.draw(g2d);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        System.out.println("123123");
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        pacman.update();
+        repaint(); // ve lai game
+    }
+
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        pacman.keyPressed(e.getKeyCode());
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
     }
 }

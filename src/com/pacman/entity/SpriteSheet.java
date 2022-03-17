@@ -13,6 +13,8 @@ public class SpriteSheet implements Constants {
     }
 
     public BufferedImage grabImage(int row, int col) {
+        row += 1;
+        col += 1;
         BufferedImage img = image.getSubimage((col * CELL_SIZE) - CELL_SIZE, (row * CELL_SIZE) - CELL_SIZE, CELL_SIZE, CELL_SIZE);
         return img;
     }
