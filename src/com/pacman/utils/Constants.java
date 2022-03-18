@@ -1,4 +1,4 @@
-package com.pacman.ultis;
+package com.pacman.utils;
 
 public interface Constants {
     public static final int CELL_SIZE = 32; // SPRITE size

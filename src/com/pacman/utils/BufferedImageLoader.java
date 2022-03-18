@@ -1,4 +1,4 @@
-package com.pacman.ultis;
+package com.pacman.utils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

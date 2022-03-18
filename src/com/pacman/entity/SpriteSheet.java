@@ -1,6 +1,6 @@
 package com.pacman.entity;
 
-import com.pacman.ultis.Constants;
+import com.pacman.utils.Constants;
 
 import java.awt.image.BufferedImage;
 

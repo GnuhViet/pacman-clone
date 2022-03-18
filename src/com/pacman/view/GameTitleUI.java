@@ -1,6 +1,6 @@
 package com.pacman.view;
 
-import com.pacman.ultis.Constants;
+import com.pacman.utils.Constants;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

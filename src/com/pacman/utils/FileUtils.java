@@ -1,4 +1,4 @@
-package com.pacman.ultis;
+package com.pacman.utils;
 
 import com.pacman.entity.Pacman;
 
@@ -46,7 +46,7 @@ public class FileUtils {
                         mapOutput[i][j] = Constants.Cell.Pellet;
                         break;
                     case "P":
-                        pacman.setPosition(j,i);
+                        pacman.setPosition(j + 1,i + 1);
                         break;
                     case "o":
                         mapOutput[i][j] = Constants.Cell.Energizer;

@@ -1,11 +1,11 @@
 package com.pacman.entity;
 
-import com.pacman.ultis.BufferedImageLoader;
-import com.pacman.ultis.Constants;
+import com.pacman.controller.GameController;
+import com.pacman.utils.BufferedImageLoader;
+import com.pacman.utils.Constants;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 
@@ -16,7 +16,7 @@ public class Pacman extends JLabel{
     private int direction;
 
     Point position;
-
+    private boolean[] wall;
     //
     private int animationTimer;
     private int energizerTimer;
@@ -26,10 +26,13 @@ public class Pacman extends JLabel{
     SpriteSheet pacmanDeadSprite;
 
     public Pacman() throws IOException {
+        animationTimer = 0;
         position = new Point();
         direction = 0;
         pacmanSprite = new SpriteSheet(BufferedImageLoader.loadImage("src/com/pacman/res/Entity/Pacman16.png"));
         pacmanDeadSprite = new SpriteSheet(BufferedImageLoader.loadImage("src/com/pacman/res/Entity/PacmanDeath16.png"));
+
+        wall = new boolean[4];
     }
 
     public boolean isAnimationOver() {
@@ -49,16 +52,13 @@ public class Pacman extends JLabel{
     }
 
     public void draw(Graphics2D g2d) {
-        int x = position.x + 1;
-        int y = position.y + 1;
-
-        int xPos = (((x * Constants.CELL_SIZE) - Constants.CELL_SIZE) * Constants.SCREEN_RESIZE);
-        int yPos = (Constants.CELL_SIZE * 2 + ((y * Constants.CELL_SIZE) - Constants.CELL_SIZE) * Constants.SCREEN_RESIZE);
 
         int frame = animationTimer / Constants.PACMAN_ANIMATION_SPEED;
+        //System.out.println(position.x + "move" + position.y);
 
-        g2d.drawImage(pacmanSprite.grabImage(0,0),xPos , yPos, null);
+        g2d.drawImage(pacmanSprite.grabImage(0,0), position.x, position.y, null);
 
+        animationTimer = (1 + animationTimer) % (Constants.PACMAN_ANIMATION_SPEED * Constants.PACMAN_DEATH_FRAMES);
     }
 
     public void setPosition(int x, int y) {
@@ -70,45 +70,51 @@ public class Pacman extends JLabel{
     }
 
     public void update() {
-        switch (direction) {
-            case 0:
-                position.x += Constants.PACMAN_SPEED - 1;
-                break;
-            case 1:
-                position.y -= Constants.PACMAN_SPEED - 1;
-                break;
-            case 2:
-                position.x -= Constants.PACMAN_SPEED - 1;
-                break;
-            case 3:
-                position.y += Constants.PACMAN_SPEED - 1;
+        if (wall[direction]) {
+            switch (direction) {
+                case 0:
+                    position.x += Constants.PACMAN_SPEED;
+                    break;
+                case 1:
+                    position.y -= Constants.PACMAN_SPEED;
+                    break;
+                case 2:
+                    position.x -= Constants.PACMAN_SPEED;
+                    break;
+                case 3:
+                    position.y += Constants.PACMAN_SPEED;
+            }
         }
 
-        if (-Constants.CELL_SIZE >= position.x)
-        {
+        if (-Constants.CELL_SIZE >= position.x) {
             position.x = Constants.CELL_SIZE * Constants.MAP_WIDTH - Constants.PACMAN_SPEED;
         }
-        else if (Constants.CELL_SIZE * Constants.MAP_WIDTH <= position.x)
-        {
+        else if (Constants.CELL_SIZE * Constants.MAP_WIDTH <= position.x) {
             position.x = Constants.PACMAN_SPEED - Constants.CELL_SIZE;
         }
     }
 
 
-    public void keyPressed(int key) {
-        if (key == KeyEvent.VK_RIGHT) {
+    public void keyPressed(int key, Constants.Cell[][] map) {
+
+        wall[0] = GameController.mapCollision(Constants.PACMAN_SPEED + position.x, position.y, map);
+        wall[1] = GameController.mapCollision(position.x, position.y - Constants.PACMAN_SPEED, map);
+        wall[2] = GameController.mapCollision(position.x - Constants.PACMAN_SPEED, position.y, map);
+        wall[3] = GameController.mapCollision(position.x, Constants.PACMAN_SPEED +position.y, map);
+
+        if (key == KeyEvent.VK_RIGHT && wall[0]) {
             direction = 0;
         }
 
-        if (key == KeyEvent.VK_UP) {
+        if (key == KeyEvent.VK_UP && wall[1]) {
             direction = 1;
         }
 
-        if (key == KeyEvent.VK_LEFT) {
+        if (key == KeyEvent.VK_LEFT && wall[2]) {
             direction = 2;
         }
 
-        if (key == KeyEvent.VK_DOWN) {
+        if (key == KeyEvent.VK_DOWN && wall[3]) {
             direction = 3;
         }
     }

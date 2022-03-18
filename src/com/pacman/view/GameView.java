@@ -2,9 +2,9 @@ package com.pacman.view;
 
 import com.pacman.entity.Pacman;
 import com.pacman.entity.SpriteSheet;
-import com.pacman.ultis.BufferedImageLoader;
-import com.pacman.ultis.Constants;
-import com.pacman.ultis.FileUtils;
+import com.pacman.utils.BufferedImageLoader;
+import com.pacman.utils.Constants;
+import com.pacman.utils.FileUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -31,8 +31,13 @@ public class GameView extends JPanel implements ActionListener, KeyListener{
         mapSprite = new SpriteSheet(BufferedImageLoader.loadImage("src/com/pacman/res/Entity/Map16.png"));
 
         mapInput = data.getMap(pacman); //TODO .. chinh sua lai
+        int pacmanX = ((pacman.getPosition().x * Constants.CELL_SIZE) - Constants.CELL_SIZE) * Constants.SCREEN_RESIZE;
+        int pacmanY = Constants.CELL_SIZE * 2 + ((pacman.getPosition().y * Constants.CELL_SIZE) - Constants.CELL_SIZE) * Constants.SCREEN_RESIZE;
 
-        timer = new Timer(200,this); // loop game
+        System.out.println(pacmanX + "pac" + pacmanY);
+        pacman.setPosition(pacmanX, pacmanY);
+
+        timer = new Timer(100,this); // loop game
         timer.start();
     }
 
@@ -111,13 +116,12 @@ public class GameView extends JPanel implements ActionListener, KeyListener{
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("123123");
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         pacman.update();
-        repaint(); // ve lai game
+        repaint(); // ve lai pac
     }
 
 
@@ -127,7 +131,7 @@ public class GameView extends JPanel implements ActionListener, KeyListener{
 
     @Override
     public void keyPressed(KeyEvent e) {
-        pacman.keyPressed(e.getKeyCode());
+        pacman.keyPressed(e.getKeyCode(), mapInput);
     }
 
     @Override
