@@ -1,6 +1,6 @@
 package com.pacman.view;
 
-import com.pacman.ultis.Constants;
+import com.pacman.utils.Constants;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -10,7 +10,6 @@ import java.io.IOException;
 
 public class GameTitleUI {
     private static final String GAME_TITLE = "PACMAN";
-
 
     private JFrame window;
     private ImagePanel titleUI;
@@ -26,8 +25,8 @@ public class GameTitleUI {
         window = new JFrame();
         window.setTitle(GAME_TITLE);
         window.setSize(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT);
-        window.setResizable(false);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        window.setResizable(false);
         window.setLocationRelativeTo(null);
         window.setVisible(true);
     }
@@ -89,7 +88,7 @@ public class GameTitleUI {
     }
 
 
-    // image button
+    // Image button
     private class MenuButton extends JLabel implements MouseListener {
         private static final String iconFolPath = "src\\com\\pacman\\res\\MenuButton\\";
         String buttonName;
@@ -123,6 +122,9 @@ public class GameTitleUI {
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
+
+                window.addKeyListener(gameUI);
+                window.setFocusable(true);
 
                 con.add(gameUI);
                 return;

@@ -1,4 +1,6 @@
-package com.pacman.ultis;
+package com.pacman.utils;
+
+import com.pacman.entity.Pacman;
 
 public class FileUtils {
     private static final String[] mapSketch = { // 21 x 21
@@ -25,7 +27,7 @@ public class FileUtils {
             " ################### "
     };
 
-    public Constants.Cell[][] getMap() {
+    public Constants.Cell[][] getMap(Pacman pacman) {
         Constants.Cell[][] mapOutput = new Constants.Cell[Constants.MAP_WIDTH][Constants.MAP_HEIGHT];
 
         for (int i = 0; i < Constants.MAP_WIDTH; i++) {
@@ -43,9 +45,12 @@ public class FileUtils {
                     case ".":
                         mapOutput[i][j] = Constants.Cell.Pellet;
                         break;
+                    case "P":
+                        pacman.setPosition(j + 1,i + 1);
+                        break;
                     case "o":
                         mapOutput[i][j] = Constants.Cell.Energizer;
-                        // ghost, pacman, ...
+                        // ghost
                 }
             }
         }
