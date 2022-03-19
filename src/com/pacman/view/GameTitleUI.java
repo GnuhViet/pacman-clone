@@ -124,9 +124,11 @@ public class GameTitleUI {
                 }
 
                 window.addKeyListener(gameUI);
-                window.setFocusable(true);
+                window.setFocusable(true); // for key listener
 
                 con.add(gameUI);
+
+                gameUI.startGameThread();
                 return;
             }
 

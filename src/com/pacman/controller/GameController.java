@@ -3,47 +3,34 @@ package com.pacman.controller;
 import com.pacman.utils.Constants;
 
 public class GameController {
-
-
-    //TODO
-
-    public static boolean mapCollision(int iX, int iY, Constants.Cell[][] map) {
-        return true;
-        /*
-        Constants.Cell[] cells = new Constants.Cell[4];
-
-        double cellX = iX / (double)(Constants.CELL_SIZE);
-        double cellY = iY / (double)(Constants.CELL_SIZE) - 2;
-
-        //System.out.println(cellX + "-" + cellY);
-
-        int downLeft = (int) Math.floor(cellX);
-        int downRight = (int) Math.floor(cellY);
-        int upLeft = (int) Math.ceil(cellX);
-        int upRight = (int) Math.ceil(cellY);
-
-        cells[0] = map[downLeft][downRight];
-        cells[1] = map[upLeft][downRight];
-        cells[2] = map[downLeft][upRight];
-        cells[3] = map[upLeft][upRight];
-
-
-
-        for (Constants.Cell x : cells) {
-            if (Constants.Cell.Wall == x) {
-                return true;
-            }
-        }
-        return true;
-        */
-
-    }
     /*
-    public static boolean mapCollision(boolean collectPellets, boolean useDoor, int iX, int iY, Constants.Cell[][] map) {
+    public static boolean mapCollision(int iX, int iY, Constants.Cell[][] map) {
+        Constants.Cell[] array = new Constants.Cell[4];
+
+        int fX = (int) Math.floor(iX / Constants.CELL_SIZE);
+        int cX = (int) Math.ceil (iX / Constants.CELL_SIZE);
+        int fY = (int) Math.floor(iY / Constants.CELL_SIZE);
+        int cY = (int) Math.ceil (iY / Constants.CELL_SIZE);
+
+        array[0] = map[fX][fY];
+        array[1] = map[cX][fY];
+        array[2] = map[fX][cY];
+        array[3] = map[cX][cY];
+
+        for (Constants.Cell x : array) {
+            System.out.print(x + " ");
+        }
+        System.out.println();
+        return false;
+    }
+    //TODO
+    */
+    public static boolean mapCollision(boolean iCollectPellet, boolean iUseDoor, int iX, int iY, Constants.Cell[][] map) {
         boolean output = false;
 
         double cellX = iX / (double)(Constants.CELL_SIZE);
         double cellY = iY / (double)(Constants.CELL_SIZE);
+        System.out.println(cellX + "," + cellY + " ");
 
         for (int i = 0; i < 4; i++) {
             int x = 0;
@@ -60,11 +47,13 @@ public class GameController {
                 {
                     x = (int)Math.ceil(cellX);
                     y = (int)Math.floor(cellY);
+                    break;
                 }
                 case 2:
                 {
                     x = (int)Math.floor(cellX);
                     y = (int)Math.ceil(cellY);
+                    break;
                 }
                 case 3:
                 {
@@ -73,14 +62,24 @@ public class GameController {
                 }
             }
 
+
             if (0 <= x && 0 <= y && Constants.MAP_HEIGHT > y && Constants.MAP_WIDTH > x)
             {
-                if (!collectPellets) {
-                    if (Constants.Cell.Wall == map[x][y]) {
+                if (iCollectPellet == false) {
+                    if (Constants.Cell.Wall == map[y][x]) {
                         output = true;
                     }
-                    else if (!useDoor && Constants.Cell.Door == map[x][y]) {
+                    else if (iUseDoor == false && Constants.Cell.Door == map[y][x]) {
                         output = true;
+                    }
+                }
+                else {
+                    if (Constants.Cell.Energizer == map[y][x]) {
+                        output = true;
+                        map[y][x] = Constants.Cell.Empty;
+                    }
+                    else if (Constants.Cell.Pellet == map[y][x]) {
+                        map[y][x] = Constants.Cell.Empty;
                     }
                 }
             }
@@ -88,5 +87,5 @@ public class GameController {
 
         return output;
     }
-       */
+
 }
