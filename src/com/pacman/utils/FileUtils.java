@@ -27,6 +27,30 @@ public class FileUtils {
             " ################### "
     };
 
+    private static final String[] mapSketch12 = { // 21 x 21
+            "                     ",
+            "                     ",
+            "                     ",
+            "                     ",
+            "                     ",
+            "     #         #     ",
+            "     #         #     ",
+            "     #    P    #     ",
+            "                     ",
+            "       ##   ##       ",
+            "        #####        ",
+            "                     ",
+            "                     ",
+            "                     ",
+            "                     ",
+            "                     ",
+            "                     ",
+            "                     ",
+            "                     ",
+            "                     ",
+            " ################### "
+    };
+
     public Constants.Cell[][] getMap(Pacman pacman) {
         Constants.Cell[][] mapOutput = new Constants.Cell[Constants.MAP_WIDTH][Constants.MAP_HEIGHT];
 

@@ -16,7 +16,7 @@ public class Pacman extends JLabel{
     private int direction;
 
     Point position;
-    private boolean[] wall;
+
     //
     private int animationTimer;
     private int energizerTimer;
@@ -25,30 +25,20 @@ public class Pacman extends JLabel{
     SpriteSheet pacmanSprite;
     SpriteSheet pacmanDeadSprite;
 
+    // collision
+    public Rectangle solidArea;
+
     public Pacman() throws IOException {
         animationTimer = 0;
         position = new Point();
-        direction = 0;
         pacmanSprite = new SpriteSheet(BufferedImageLoader.loadImage("src/com/pacman/res/Entity/Pacman16.png"));
         pacmanDeadSprite = new SpriteSheet(BufferedImageLoader.loadImage("src/com/pacman/res/Entity/PacmanDeath16.png"));
 
-        wall = new boolean[4];
-    }
-
-    public boolean isAnimationOver() {
-        return animationOver;
-    }
-
-    public boolean isDead() {
-        return dead;
-    }
-
-    public int getDirection() {
-        return direction;
-    }
-
-    public int getAnimationTimer() {
-        return animationTimer;
+        solidArea = new Rectangle();
+        solidArea.x = 8;
+        solidArea.y = 8;
+        solidArea.width = 24;
+        solidArea.height = 24;
     }
 
     public void draw(Graphics2D g2d) {
@@ -69,19 +59,47 @@ public class Pacman extends JLabel{
         return position;
     }
 
-    public void update() {
-        if (wall[direction]) {
+    public void update(int key, Constants.Cell[][] map) {
+        boolean[] wall = new boolean[4];
+
+        wall[0] = GameController.mapCollision(false, false, position.x + Constants.PACMAN_SPEED, position.y, map);
+        wall[1] = GameController.mapCollision(false, false, position.x, position.y - Constants.PACMAN_SPEED, map);
+        wall[2] = GameController.mapCollision(false, false, position.x - Constants.PACMAN_SPEED, position.y, map);
+        wall[3] = GameController.mapCollision(false, false, position.x, position.y + Constants.PACMAN_SPEED, map);
+
+
+        if (key == KeyEvent.VK_RIGHT) {
+            if (!wall[0])
+                direction = 0;
+        }
+
+        if (key == KeyEvent.VK_UP) {
+            if (!wall[1])
+                direction = 1;
+        }
+
+        if (key == KeyEvent.VK_LEFT) {
+            if (!wall[2])
+                direction = 2;
+        }
+
+        if (key == KeyEvent.VK_DOWN) {
+            if (!wall[3])
+                direction = 3;
+        }
+
+        if (!wall[direction]) {
             switch (direction) {
-                case 0:
+                case 0: //RIGHT
                     position.x += Constants.PACMAN_SPEED;
                     break;
-                case 1:
+                case 1: //UP
                     position.y -= Constants.PACMAN_SPEED;
                     break;
-                case 2:
+                case 2: //LEFT
                     position.x -= Constants.PACMAN_SPEED;
                     break;
-                case 3:
+                case 3: //DOWN
                     position.y += Constants.PACMAN_SPEED;
             }
         }
@@ -92,31 +110,7 @@ public class Pacman extends JLabel{
         else if (Constants.CELL_SIZE * Constants.MAP_WIDTH <= position.x) {
             position.x = Constants.PACMAN_SPEED - Constants.CELL_SIZE;
         }
-    }
 
-
-    public void keyPressed(int key, Constants.Cell[][] map) {
-
-        wall[0] = GameController.mapCollision(Constants.PACMAN_SPEED + position.x, position.y, map);
-        wall[1] = GameController.mapCollision(position.x, position.y - Constants.PACMAN_SPEED, map);
-        wall[2] = GameController.mapCollision(position.x - Constants.PACMAN_SPEED, position.y, map);
-        wall[3] = GameController.mapCollision(position.x, Constants.PACMAN_SPEED +position.y, map);
-
-        if (key == KeyEvent.VK_RIGHT && wall[0]) {
-            direction = 0;
-        }
-
-        if (key == KeyEvent.VK_UP && wall[1]) {
-            direction = 1;
-        }
-
-        if (key == KeyEvent.VK_LEFT && wall[2]) {
-            direction = 2;
-        }
-
-        if (key == KeyEvent.VK_DOWN && wall[3]) {
-            direction = 3;
-        }
     }
 
 }

@@ -11,12 +11,83 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
 
-public class GameView extends JPanel implements ActionListener, KeyListener{
+public class GameView extends JPanel implements Runnable, KeyListener{
     private FileUtils data; // TODO... chinh sua lai
     private SpriteSheet mapSprite;;
-    private Constants.Cell[][] mapInput;
+    private Constants.Cell[][] mapInput; // dua xuong Controller
     private Pacman pacman;
-    private Timer timer;
+
+    Thread gameThread;
+
+    private int key;
+
+    // JPanel methods override
+    @Override
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        Graphics2D g2d = (Graphics2D) g;
+        try {
+            this.drawMap(g2d);
+            pacman.draw(g2d);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        g2d.dispose();
+    }
+
+    // Interface method implements
+    @Override
+    public void run() {
+        // 1 sec = 1000000000 nanosec
+        // draw 60fps
+        double drawInterval = 1000000000/Constants.FPS; // drawn 1 frame in 0.0166sec
+        double delta = 0;
+        long lastTime = System.nanoTime();
+        long currentTime;
+
+        // count fps
+        long timer = 0;
+        int drawCount = 0;
+        while (gameThread != null) {
+            // draw 60fps
+            currentTime = System.nanoTime();
+            delta += (currentTime - lastTime) / drawInterval;
+            timer += currentTime - lastTime;
+            lastTime = currentTime;
+
+            if (delta >= 1) { // delta >= 1 mean past 0.0166 sec
+                // 1. update pacman position
+                pacman.update(key, mapInput);
+                // 2. redraw the screen
+                this.repaint();
+                // reset delta
+                delta--;
+
+                drawCount++;
+            }
+
+            if (timer >= 1000000000) {
+                //System.out.println("FPS:" + drawCount);
+                drawCount = 0;
+                timer = 0;
+            }
+
+        }
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {}
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        key = e.getKeyCode();
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {}
+
+    // GameView methods
 
     public GameView() throws IOException {
         data = new FileUtils();
@@ -24,23 +95,23 @@ public class GameView extends JPanel implements ActionListener, KeyListener{
         initGame();
     }
 
+    public void startGameThread() {
+        gameThread = new Thread(this);
+        gameThread.start();
+    }
+
     private void initGame() throws IOException {
         this.setOpaque(true);
         this.setBackground(Color.BLACK);
 
         mapSprite = new SpriteSheet(BufferedImageLoader.loadImage("src/com/pacman/res/Entity/Map16.png"));
-
         mapInput = data.getMap(pacman); //TODO .. chinh sua lai
-        int pacmanX = ((pacman.getPosition().x * Constants.CELL_SIZE) - Constants.CELL_SIZE) * Constants.SCREEN_RESIZE;
-        int pacmanY = Constants.CELL_SIZE * 2 + ((pacman.getPosition().y * Constants.CELL_SIZE) - Constants.CELL_SIZE) * Constants.SCREEN_RESIZE;
 
-        System.out.println(pacmanX + "pac" + pacmanY);
+        // move to right pos in map
+        int pacmanX = ((pacman.getPosition().x * Constants.CELL_SIZE) - Constants.CELL_SIZE);
+        int pacmanY = ((pacman.getPosition().y * Constants.CELL_SIZE) - Constants.CELL_SIZE);
         pacman.setPosition(pacmanX, pacmanY);
-
-        timer = new Timer(100,this); // loop game
-        timer.start();
     }
-
 
     private void drawMap(Graphics2D g2d) throws IOException {
 
@@ -50,8 +121,8 @@ public class GameView extends JPanel implements ActionListener, KeyListener{
                 int x = b + 1;
                 int y = a + 1;
 
-                int xPos = ((x * Constants.CELL_SIZE) - Constants.CELL_SIZE) * Constants.SCREEN_RESIZE;
-                int yPos = Constants.CELL_SIZE * 2 + ((y * Constants.CELL_SIZE) - Constants.CELL_SIZE) * Constants.SCREEN_RESIZE;
+                int xPos = ((x * Constants.CELL_SIZE) - Constants.CELL_SIZE);
+                int yPos = ((y * Constants.CELL_SIZE) - Constants.CELL_SIZE);
 
                 switch (mapInput[a][b]) {
                     case Door: {
@@ -106,35 +177,4 @@ public class GameView extends JPanel implements ActionListener, KeyListener{
         }
     }
 
-    @Override
-    public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        Graphics2D g2d = (Graphics2D) g;
-        try {
-            this.drawMap(g2d);
-            pacman.draw(g2d);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        pacman.update();
-        repaint(); // ve lai pac
-    }
-
-
-    @Override
-    public void keyTyped(KeyEvent e) {
-    }
-
-    @Override
-    public void keyPressed(KeyEvent e) {
-        pacman.keyPressed(e.getKeyCode(), mapInput);
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-    }
 }
