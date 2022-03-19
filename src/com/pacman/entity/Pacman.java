@@ -31,8 +31,8 @@ public class Pacman extends JLabel{
     public Pacman() throws IOException {
         animationTimer = 0;
         position = new Point();
-        pacmanSprite = new SpriteSheet(BufferedImageLoader.loadImage("src/com/pacman/res/Entity/Pacman16.png"));
-        pacmanDeadSprite = new SpriteSheet(BufferedImageLoader.loadImage("src/com/pacman/res/Entity/PacmanDeath16.png"));
+        pacmanSprite = new SpriteSheet(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\Entity\\Pacman32.png"));
+        pacmanDeadSprite = new SpriteSheet(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\Entity\\PacmanDeath32.png"));
 
         solidArea = new Rectangle();
         solidArea.x = 8;

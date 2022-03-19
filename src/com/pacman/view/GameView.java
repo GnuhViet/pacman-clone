@@ -104,7 +104,7 @@ public class GameView extends JPanel implements Runnable, KeyListener{
         this.setOpaque(true);
         this.setBackground(Color.BLACK);
 
-        mapSprite = new SpriteSheet(BufferedImageLoader.loadImage("src/com/pacman/res/Entity/Map16.png"));
+        mapSprite = new SpriteSheet(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\Entity\\Map32.png"));
         mapInput = data.getMap(pacman); //TODO .. chinh sua lai
 
         // move to right pos in map

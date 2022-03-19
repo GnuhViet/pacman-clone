@@ -32,7 +32,7 @@ public class GameTitleUI {
     }
 
     private void initTileUI() {
-        titleUI = new ImagePanel("src/com/pacman/res/title-background.jpg");
+        titleUI = new ImagePanel("src\\com\\pacman\\res\\title-background.jpg");
         con = window.getContentPane();
 
         // Title panel config
@@ -44,7 +44,7 @@ public class GameTitleUI {
 
         // Logo panel config
         JLabel logo = new JLabel();
-        logo.setIcon(new ImageIcon("src/com/pacman/res/menu-logo.png"));
+        logo.setIcon(new ImageIcon("src\\com\\pacman\\res\\menu-logo.png"));
         logoPanel.add(logo);
         logoPanel.setBorder(new EmptyBorder(40,0,0,0));
         logoPanel.setOpaque(false);
