@@ -62,11 +62,10 @@ public class Pacman extends JLabel{
     public void update(int key, Constants.Cell[][] map) {
         boolean[] wall = new boolean[4];
 
-        wall[0] = GameController.mapCollision(false, false, position.x + Constants.PACMAN_SPEED, position.y, map);
-        wall[1] = GameController.mapCollision(false, false, position.x, position.y - Constants.PACMAN_SPEED, map);
-        wall[2] = GameController.mapCollision(false, false, position.x - Constants.PACMAN_SPEED, position.y, map);
-        wall[3] = GameController.mapCollision(false, false, position.x, position.y + Constants.PACMAN_SPEED, map);
-
+        wall[0] = GameController.mapCollision(false, position.x + Constants.PACMAN_SPEED, position.y, map);
+        wall[1] = GameController.mapCollision(false, position.x, position.y - Constants.PACMAN_SPEED, map);
+        wall[2] = GameController.mapCollision(false, position.x - Constants.PACMAN_SPEED, position.y, map);
+        wall[3] = GameController.mapCollision(false, position.x, position.y + Constants.PACMAN_SPEED, map);
 
         if (key == KeyEvent.VK_RIGHT) {
             if (!wall[0])

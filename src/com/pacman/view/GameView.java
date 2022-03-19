@@ -1,5 +1,6 @@
 package com.pacman.view;
 
+import com.pacman.controller.GameController;
 import com.pacman.entity.Pacman;
 import com.pacman.entity.SpriteSheet;
 import com.pacman.utils.BufferedImageLoader;
@@ -57,9 +58,14 @@ public class GameView extends JPanel implements Runnable, KeyListener{
             lastTime = currentTime;
 
             if (delta >= 1) { // delta >= 1 mean past 0.0166 sec
+
                 // 1. update pacman position
                 pacman.update(key, mapInput);
-                // 2. redraw the screen
+                // 2. update map
+                int x = (int) Math.round(pacman.getPosition().x / (double)(Constants.CELL_SIZE));
+                int y = (int) Math.round(pacman.getPosition().y / (double)(Constants.CELL_SIZE));
+                mapInput[y][x] = GameController.mapUpdate(x, y, mapInput);
+                // 3. redraw the screen
                 this.repaint();
                 // reset delta
                 delta--;
@@ -68,7 +74,7 @@ public class GameView extends JPanel implements Runnable, KeyListener{
             }
 
             if (timer >= 1000000000) {
-                //System.out.println("FPS:" + drawCount);
+                System.out.println("FPS:" + drawCount);
                 drawCount = 0;
                 timer = 0;
             }
