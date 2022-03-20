@@ -83,9 +83,11 @@ public class GameView extends JPanel implements Runnable, KeyListener{
                 pacman.update(key, mapInput);
                 ghost.update(ghostDir,mapInput);
                 // 2. update map
-                int x = (int) Math.round(pacman.getPosition().x / (double)(Constants.CELL_SIZE));
-                int y = (int) Math.round(pacman.getPosition().y / (double)(Constants.CELL_SIZE));
-                mapInput[y][x] = GameController.mapUpdate(x, y, mapInput);
+                int x = (int) Math.round(pacman.getPosition().x / (double) (Constants.CELL_SIZE));
+                int y = (int) Math.round(pacman.getPosition().y / (double) (Constants.CELL_SIZE));
+                if (0 <= x && 0 <= y && Constants.MAP_HEIGHT > y && Constants.MAP_WIDTH > x) {
+                    mapInput[y][x] = GameController.mapUpdate(x, y, mapInput);
+                }
                 // 3. redraw the screen
                 this.repaint();
                 // reset delta

@@ -7,9 +7,7 @@ public class GameController {
         if (Constants.Cell.Energizer == map[y][x]) {
             return Constants.Cell.Empty;
         }
-        //pellet
         return Constants.Cell.Empty;
-
     }
 
     public static boolean mapCollision(boolean iUseDoor, int iX, int iY, Constants.Cell[][] map) {
