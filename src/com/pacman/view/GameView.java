@@ -15,10 +15,14 @@ import java.io.IOException;
 public class GameView extends JPanel implements Runnable, KeyListener{
     private FileUtils data; // TODO... chinh sua lai
     private SpriteSheet mapSprite;;
-    private Constants.Cell[][] mapInput; // dua xuong Controller
-    private Pacman pacman;
+    private Constants.Cell[][] mapInput;
+    private final Pacman pacman;
 
     Thread gameThread;
+
+    boolean off = false;
+    long offTime;
+    long onTime;
 
     private int key;
 
@@ -37,7 +41,7 @@ public class GameView extends JPanel implements Runnable, KeyListener{
         g2d.dispose();
     }
 
-    // Interface method implements
+    // Runnable method implements
     @Override
     public void run() {
         // 1 sec = 1000000000 nanosec
@@ -46,10 +50,10 @@ public class GameView extends JPanel implements Runnable, KeyListener{
         double delta = 0;
         long lastTime = System.nanoTime();
         long currentTime;
-
         // count fps
         long timer = 0;
         int drawCount = 0;
+
         while (gameThread != null) {
             // draw 60fps
             currentTime = System.nanoTime();
@@ -58,7 +62,6 @@ public class GameView extends JPanel implements Runnable, KeyListener{
             lastTime = currentTime;
 
             if (delta >= 1) { // delta >= 1 mean past 0.0166 sec
-
                 // 1. update pacman position
                 pacman.update(key, mapInput);
                 // 2. update map
@@ -69,19 +72,35 @@ public class GameView extends JPanel implements Runnable, KeyListener{
                 this.repaint();
                 // reset delta
                 delta--;
-
+                // count frame
                 drawCount++;
             }
 
+            //for blinking energizer
+            if (off) {
+                offTime += timer;
+            } else {
+                onTime += timer;
+            }
+            if (onTime  >= 800000000) {
+                off = true;
+                onTime = 0;
+            }
+            if (offTime >= 800000000) {
+                off = false;
+                offTime = 0;
+            }
+
+            // print fps
             if (timer >= 1000000000) {
                 System.out.println("FPS:" + drawCount);
                 drawCount = 0;
                 timer = 0;
             }
-
         }
     }
 
+    // KeyListener method implements
     @Override
     public void keyTyped(KeyEvent e) {}
 
@@ -93,8 +112,9 @@ public class GameView extends JPanel implements Runnable, KeyListener{
     @Override
     public void keyReleased(KeyEvent e) {}
 
-    // GameView methods
-
+    ////////////////////////
+    /////// GameView methods
+    ////////////////////////
     public GameView() throws IOException {
         data = new FileUtils();
         pacman = new Pacman();
@@ -136,6 +156,10 @@ public class GameView extends JPanel implements Runnable, KeyListener{
                         break;
                     }
                     case Energizer: {
+                        if (off) {
+                            g2d.drawImage(mapSprite.grabImage(1,3),  xPos, yPos, null);
+                            break;
+                        }
                         g2d.drawImage(mapSprite.grabImage(1,1),  xPos, yPos, null);
                         break;
                     }

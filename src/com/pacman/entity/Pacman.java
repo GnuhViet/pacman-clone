@@ -42,13 +42,12 @@ public class Pacman extends JLabel{
     }
 
     public void draw(Graphics2D g2d) {
+        int frame = (int) Math.floor(animationTimer / Constants.PACMAN_ANIMATION_SPEED);
 
-        int frame = animationTimer / Constants.PACMAN_ANIMATION_SPEED;
-        //System.out.println(position.x + "move" + position.y);
+        g2d.drawImage(pacmanSprite.grabImage(direction, frame), position.x, position.y, null);
 
-        g2d.drawImage(pacmanSprite.grabImage(0,0), position.x, position.y, null);
+        animationTimer = (animationTimer + 1) % (Constants.PACMAN_ANIMATION_SPEED * Constants.PACMAN_ANIMATION_FRAMES);
 
-        animationTimer = (1 + animationTimer) % (Constants.PACMAN_ANIMATION_SPEED * Constants.PACMAN_DEATH_FRAMES);
     }
 
     public void setPosition(int x, int y) {
