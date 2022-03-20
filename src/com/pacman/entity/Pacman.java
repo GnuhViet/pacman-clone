@@ -95,10 +95,10 @@ public class Pacman extends JLabel{
             }
         }
 
-        if (-Constants.CELL_SIZE >= position.x) {
+        if (position.x <= -Constants.CELL_SIZE) {
             position.x = Constants.CELL_SIZE * Constants.MAP_WIDTH - Constants.PACMAN_SPEED;
         }
-        else if (Constants.CELL_SIZE * Constants.MAP_WIDTH <= position.x) {
+        else if (position.x >= Constants.CELL_SIZE * Constants.MAP_WIDTH) {
             position.x = Constants.PACMAN_SPEED - Constants.CELL_SIZE;
         }
     }
