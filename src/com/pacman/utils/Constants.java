@@ -14,6 +14,10 @@ public interface Constants {
     public static final int PACMAN_DEATH_FRAMES = 12;
     public static final int PACMAN_SPEED = 2;
 
+    public static final int GHOST_SPEED = 2;
+    public static final int GHOST_ANIMATION_SPEED = 10;
+    public static final int GHOST_ANIMATION_FRAMES = 2;
+
     public static final int FPS = 60;
 
     enum Cell {

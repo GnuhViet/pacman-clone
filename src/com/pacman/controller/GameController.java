@@ -4,11 +4,9 @@ import com.pacman.utils.Constants;
 
 public class GameController {
     public static Constants.Cell mapUpdate(int x, int y, Constants.Cell[][] map) {
-
         if (Constants.Cell.Energizer == map[y][x]) {
             return Constants.Cell.Empty;
         }
-
         //pellet
         return Constants.Cell.Empty;
 
@@ -50,7 +48,7 @@ public class GameController {
                 }
             }
 
-
+            // kiem tra xem vi tri co trong map khong
             if (0 <= x && 0 <= y && Constants.MAP_HEIGHT > y && Constants.MAP_WIDTH > x)
             {
                 if (Constants.Cell.Wall == map[y][x]) {

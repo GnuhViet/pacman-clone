@@ -7,38 +7,26 @@ import com.pacman.utils.Constants;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 public class Pacman extends JLabel{
-    private boolean animationOver;
-    private boolean dead;
 
     private int direction;
-
     Point position;
 
     //
     private int animationTimer;
-    private int energizerTimer;
 
     //
     SpriteSheet pacmanSprite;
     SpriteSheet pacmanDeadSprite;
-
-    // collision
-    public Rectangle solidArea;
 
     public Pacman() throws IOException {
         animationTimer = 0;
         position = new Point();
         pacmanSprite = new SpriteSheet(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\Entity\\Pacman32.png"));
         pacmanDeadSprite = new SpriteSheet(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\Entity\\PacmanDeath32.png"));
-
-        solidArea = new Rectangle();
-        solidArea.x = 8;
-        solidArea.y = 8;
-        solidArea.width = 24;
-        solidArea.height = 24;
     }
 
     public void draw(Graphics2D g2d) {
@@ -61,9 +49,14 @@ public class Pacman extends JLabel{
     public void update(int key, Constants.Cell[][] map) {
         boolean[] wall = new boolean[4];
 
+        // check 4 ben xung quanh co la tuong khong
+        // right
         wall[0] = GameController.mapCollision(false, position.x + Constants.PACMAN_SPEED, position.y, map);
+        // up
         wall[1] = GameController.mapCollision(false, position.x, position.y - Constants.PACMAN_SPEED, map);
+        // left
         wall[2] = GameController.mapCollision(false, position.x - Constants.PACMAN_SPEED, position.y, map);
+        // down
         wall[3] = GameController.mapCollision(false, position.x, position.y + Constants.PACMAN_SPEED, map);
 
         if (key == KeyEvent.VK_RIGHT) {
@@ -108,7 +101,6 @@ public class Pacman extends JLabel{
         else if (Constants.CELL_SIZE * Constants.MAP_WIDTH <= position.x) {
             position.x = Constants.PACMAN_SPEED - Constants.CELL_SIZE;
         }
-
     }
 
 }

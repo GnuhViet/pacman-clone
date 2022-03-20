@@ -1,5 +1,6 @@
 package com.pacman.utils;
 
+import com.pacman.entity.Ghost;
 import com.pacman.entity.Pacman;
 
 public class FileUtils {
@@ -11,9 +12,9 @@ public class FileUtils {
             " #.##.#.#####.#.##.# ",
             " #....#...#...#....# ",
             " ####.### # ###.#### ",
-            "    #.#   0   #.#    ",
+            "    #.#   1   #.#    ",
             "#####.# ##=## #.#####",
-            "     .  #123#  .     ",
+            "     .  #   #  .     ",
             "#####.# ##### #.#####",
             "    #.#       #.#    ",
             " ####.# ##### #.#### ",
@@ -51,7 +52,7 @@ public class FileUtils {
             " ################### "
     };
 
-    public Constants.Cell[][] getMap(Pacman pacman) {
+    public Constants.Cell[][] getMap(Pacman pacman, Ghost ghost) {
         Constants.Cell[][] mapOutput = new Constants.Cell[Constants.MAP_WIDTH][Constants.MAP_HEIGHT];
 
         for (int i = 0; i < Constants.MAP_WIDTH; i++) {
@@ -71,6 +72,11 @@ public class FileUtils {
                         break;
                     case "P":
                         pacman.setPosition(j + 1,i + 1);
+                        break;
+                    case "1":
+                    case "2":
+                    case "3":
+                        ghost.setPosition(j + 1, i + 1);
                         break;
                     case "o":
                         mapOutput[i][j] = Constants.Cell.Energizer;
