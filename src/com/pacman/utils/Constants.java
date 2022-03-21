@@ -18,6 +18,10 @@ public interface Constants {
     public static final int GHOST_ANIMATION_SPEED = 10;
     public static final int GHOST_ANIMATION_FRAMES = 2;
 
+    public static final int GHOST_PINK_CHASE = 4;
+    public static final int GHOST_BLUE_CHASE = 2;
+    public static final int GHOST_ORANGE_CHASE = 5;
+
     public static final int FPS = 60;
 
     enum Cell {

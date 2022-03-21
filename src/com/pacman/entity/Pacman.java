@@ -46,6 +46,10 @@ public class Pacman extends JLabel{
         return position;
     }
 
+    public int getDirection() {
+        return direction;
+    }
+
     public void update(int key, Constants.Cell[][] map) {
         boolean[] wall = new boolean[4];
 

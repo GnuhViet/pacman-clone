@@ -3,6 +3,17 @@ package com.pacman.controller;
 import com.pacman.utils.Constants;
 
 public class GameController {
+    public static boolean isWin(Constants.Cell[][] map) {
+        for (int i = 0; i < Constants.MAP_WIDTH; i++) {
+            for (int j = 0; j < Constants.MAP_HEIGHT; j++) {
+                if (map[i][j] == Constants.Cell.Pellet || map[i][j] == Constants.Cell.Energizer) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     public static Constants.Cell mapUpdate(int x, int y, Constants.Cell[][] map) {
         if (Constants.Cell.Energizer == map[y][x]) {
             return Constants.Cell.Empty;

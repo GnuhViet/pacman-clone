@@ -1,7 +1,7 @@
 package com.pacman.view;
 
 import com.pacman.controller.GameController;
-import com.pacman.entity.Ghost;
+import com.pacman.controller.GhostManager;
 import com.pacman.entity.Pacman;
 import com.pacman.entity.SpriteSheet;
 import com.pacman.utils.BufferedImageLoader;
@@ -12,14 +12,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
-import java.util.Random;
 
 public class GameView extends JPanel implements Runnable, KeyListener{
     private FileUtils data; // TODO... chinh sua lai
     private SpriteSheet mapSprite;;
     private Constants.Cell[][] mapInput;
-    private final Pacman pacman;
-    private final Ghost ghost;
+    private Pacman pacman;
+    private GhostManager ghostManager;
 
     Thread gameThread;
 
@@ -29,6 +28,8 @@ public class GameView extends JPanel implements Runnable, KeyListener{
 
     private int key;
 
+    boolean isWin;
+
     // JPanel methods override
     @Override
     public void paintComponent(Graphics g) {
@@ -37,7 +38,7 @@ public class GameView extends JPanel implements Runnable, KeyListener{
         try {
             this.drawMap(g2d);
             pacman.draw(g2d);
-            ghost.draw(g2d);
+            ghostManager.draw(g2d);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -58,38 +59,34 @@ public class GameView extends JPanel implements Runnable, KeyListener{
         long timer = 0;
         int drawCount = 0;
 
-        int ghostDir = 0;
-        long timeCount = 0;
-        Random rand = new Random();
 
-        while (gameThread != null) {
+        while (!isWin) {
             // draw 60fps
             currentTime = System.nanoTime();
             delta += (currentTime - lastTime) / drawInterval;
             timer += currentTime - lastTime;
 
-            timeCount += currentTime - lastTime;
-
             lastTime = currentTime;
 
-            if (timeCount >= 2000000000) {
-                ghostDir = rand.nextInt(3) + 1;
-                timeCount = 0;
-            }
-
-            if (delta >= 1) {
-                // delta >= 1 mean past 0.0166 sec
+            if (delta >= 1) {// delta >= 1 mean past 0.0166 sec
                 // 1. update pacman position
                 pacman.update(key, mapInput);
-                ghost.update(ghostDir,mapInput);
+
                 // 2. update map
                 int x = (int) Math.round(pacman.getPosition().x / (double) (Constants.CELL_SIZE));
                 int y = (int) Math.round(pacman.getPosition().y / (double) (Constants.CELL_SIZE));
                 if (0 <= x && 0 <= y && Constants.MAP_HEIGHT > y && Constants.MAP_WIDTH > x) {
                     mapInput[y][x] = GameController.mapUpdate(x, y, mapInput);
                 }
-                // 3. redraw the screen
+
+                // 3. update ghost
+                ghostManager.update(mapInput, pacman.getPosition(), pacman.getDirection());
+
+                // 4. redraw the screen
                 this.repaint();
+
+                // 5. Check win
+                isWin = GameController.isWin(mapInput);
                 // reset delta
                 delta--;
                 // count frame
@@ -114,13 +111,16 @@ public class GameView extends JPanel implements Runnable, KeyListener{
 
             // print fps
             if (timer >= 1000000000) {
-                System.out.println("FPS:" + drawCount);
+                //System.out.println("FPS:" + drawCount);
                 drawCount = 0;
                 timer = 0;
             }
         }
     }
 
+    public void gameStop() {
+
+    }
     // KeyListener method implements
     @Override
     public void keyTyped(KeyEvent e) {}
@@ -139,13 +139,14 @@ public class GameView extends JPanel implements Runnable, KeyListener{
     public GameView() throws IOException {
         data = new FileUtils();
         pacman = new Pacman();
-        ghost = new Ghost();
+        ghostManager = new GhostManager();
         initGame();
     }
 
     public void startGameThread() {
         gameThread = new Thread(this);
         gameThread.start();
+        isWin = false;
     }
 
     private void initGame() throws IOException {
@@ -153,16 +154,15 @@ public class GameView extends JPanel implements Runnable, KeyListener{
         this.setBackground(Color.BLACK);
 
         mapSprite = new SpriteSheet(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\Entity\\Map32.png"));
-        mapInput = data.getMap(pacman, ghost); //TODO .. chinh sua lai
+        mapInput = data.getMap(pacman, ghostManager); //TODO .. chinh sua lai
 
         // move to right pos in map
         int pacmanX = ((pacman.getPosition().x * Constants.CELL_SIZE) - Constants.CELL_SIZE);
         int pacmanY = ((pacman.getPosition().y * Constants.CELL_SIZE) - Constants.CELL_SIZE);
         pacman.setPosition(pacmanX, pacmanY);
 
-        int ghostX =  ((ghost.getPosition().x * Constants.CELL_SIZE) - Constants.CELL_SIZE);
-        int ghostY =  ((ghost.getPosition().y * Constants.CELL_SIZE) - Constants.CELL_SIZE);
-        ghost.setPosition(ghostX, ghostY);
+        ghostManager.initPos();
+        ghostManager.reset();
     }
 
     private void drawMap(Graphics2D g2d) throws IOException {

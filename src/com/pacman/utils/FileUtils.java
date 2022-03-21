@@ -1,5 +1,6 @@
 package com.pacman.utils;
 
+import com.pacman.controller.GhostManager;
 import com.pacman.entity.Ghost;
 import com.pacman.entity.Pacman;
 
@@ -12,9 +13,9 @@ public class FileUtils {
             " #.##.#.#####.#.##.# ",
             " #....#...#...#....# ",
             " ####.### # ###.#### ",
-            "    #.#   1   #.#    ",
+            "    #.#   0   #.#    ",
             "#####.# ##=## #.#####",
-            "     .  #   #  .     ",
+            "     .  #123#  .     ",
             "#####.# ##### #.#####",
             "    #.#       #.#    ",
             " ####.# ##### #.#### ",
@@ -28,31 +29,7 @@ public class FileUtils {
             " ################### "
     };
 
-    private static final String[] mapSketch12 = { // 21 x 21
-            "                     ",
-            "                     ",
-            "                     ",
-            "                     ",
-            "                     ",
-            "     #         #     ",
-            "     #         #     ",
-            "     #    P    #     ",
-            "                     ",
-            "       ##   ##       ",
-            "        #####        ",
-            "                     ",
-            "                     ",
-            "                     ",
-            "                     ",
-            "                     ",
-            "                     ",
-            "                     ",
-            "                     ",
-            "                     ",
-            " ################### "
-    };
-
-    public Constants.Cell[][] getMap(Pacman pacman, Ghost ghost) {
+    public Constants.Cell[][] getMap(Pacman pacman, GhostManager ghost) {
         Constants.Cell[][] mapOutput = new Constants.Cell[Constants.MAP_WIDTH][Constants.MAP_HEIGHT];
 
         for (int i = 0; i < Constants.MAP_WIDTH; i++) {
@@ -73,14 +50,20 @@ public class FileUtils {
                     case "P":
                         pacman.setPosition(j + 1,i + 1);
                         break;
+                    case "0":
+                        ghost.setPosition(GhostManager.GhostType.RED, j + 1, i + 1);
+                        break;
                     case "1":
+                        ghost.setPosition(GhostManager.GhostType.PINK, j + 1, i + 1);
+                        break;
                     case "2":
+                        ghost.setPosition(GhostManager.GhostType.BLUE, j + 1, i + 1);
+                        break;
                     case "3":
-                        ghost.setPosition(j + 1, i + 1);
+                        ghost.setPosition(GhostManager.GhostType.ORANGE, j + 1, i + 1);
                         break;
                     case "o":
                         mapOutput[i][j] = Constants.Cell.Energizer;
-                        // ghost
                 }
             }
         }
