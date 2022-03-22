@@ -79,15 +79,18 @@ public class GameView extends JPanel implements Runnable, KeyListener{
                 // 1. update pacman position
                 pacman.update(key, mapInput);
 
-                // 2. update map
+                // 2. check eat energizer
                 int x = (int) Math.round(pacman.getPosition().x / (double) (Constants.CELL_SIZE));
                 int y = (int) Math.round(pacman.getPosition().y / (double) (Constants.CELL_SIZE));
-                if (0 <= x && 0 <= y && Constants.MAP_HEIGHT > y && Constants.MAP_WIDTH > x) {
+                pacman.updateEnergizer(mapInput[y][x]);
+
+                // 3. update map
+                if (Constants.MAP_HEIGHT > y && Constants.MAP_WIDTH > x) {
                     mapInput[y][x] = GameController.mapUpdate(x, y, mapInput);
                 }
 
                 // 3. update ghost
-                ghostManager.update(mapInput, pacman.getPosition(), pacman.getDirection());
+                ghostManager.update(mapInput, pacman);
 
                 // 4. redraw the screen
                 this.repaint();
@@ -118,7 +121,11 @@ public class GameView extends JPanel implements Runnable, KeyListener{
 
             // print fps and update phase
             if (timer >= 1000000000) {
-                System.out.println("FPS:" + drawCount);
+                System.out.println("Timer: " + pacman.getEnergizerTimer());
+                if (pacman.getEnergizerTimer() > 0) {
+                    pacman.reduceEnergizerTimer();
+                }
+                //System.out.println("FPS:" + drawCount);
                 ghostManager.phaseUpdate();
                 drawCount = 0;
                 timer = 0;

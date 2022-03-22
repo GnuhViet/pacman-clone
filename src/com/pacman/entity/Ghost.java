@@ -18,6 +18,11 @@ public class Ghost {
     private Point home;
     private Point homeExit;
 
+    // 0 la khong bi
+    // 1 la nhap nhay
+    // 2 la bi an
+    private int frightenedMode;
+
     //
     private int animationTimer;
 
@@ -37,11 +42,16 @@ public class Ghost {
 
     public void draw(int i, Graphics2D g2d) {
         int frame = (int) Math.floor(animationTimer / Constants.GHOST_ANIMATION_SPEED);
-
-        g2d.drawImage(ghostSprite.grabImage(i, frame), position.x, position.y, null);      //body
-        g2d.drawImage(ghostSprite.grabImage(5, direction), position.x, position.y, null); // eyes
-
         animationTimer = (animationTimer + 1) % (Constants.GHOST_ANIMATION_SPEED * Constants.GHOST_ANIMATION_FRAMES);
+
+        if (frightenedMode == 0) {
+            g2d.drawImage(ghostSprite.grabImage(i, frame), position.x, position.y, null);      //body
+            g2d.drawImage(ghostSprite.grabImage(5, direction), position.x, position.y, null); // eyes
+            return;
+        }
+        g2d.drawImage(ghostSprite.grabImage(4, frame), position.x, position.y, null);  //body
+        g2d.drawImage(ghostSprite.grabImage(5, 4), position.x, position.y, null); // eyes
+
     }
 
     public void setPosition(int x, int y) {
@@ -52,26 +62,41 @@ public class Ghost {
         return position;
     }
 
-    public void update(Constants.Cell[][] map, Point pacmanPos, int pacmanDirection, Point redGhostPosition) {
+    public void update(Constants.Cell[][] map, Pacman pacman, Point redGhostPosition) {
+        int pacmanDirection = pacman.getDirection();
+        Point pacmanPos = pacman.getPosition(); // TODO
+
         boolean canMove = false; // co di duoc khong ?
         int availableWay = 0;    // huong dang sau khong phai la huong di duoc
 
-        int speed = Constants.GHOST_SPEED;
+        int speed;
+        if (0 == frightenedMode) {
+            speed = Constants.GHOST_SPEED;
+        } else {
+            speed = Constants.GHOST_FRIGHTENED_SPEED;
+        }
 
         this.updateTarget(pacmanPos, pacmanDirection, redGhostPosition);
+
+        // bat dau va ket thuc frightened
+        if (0 == frightenedMode && pacman.getEnergizerTimer() == Constants.ENERGIZER_DURATION / Constants.FPS) {
+            frightenedMode = 1;
+        } else if (0 == pacman.getEnergizerTimer() && frightenedMode == 1) {
+            frightenedMode = 0;
+        }
 
         // check 4 ben xung quanh co la tuong khong
         boolean[] wall = new boolean[4];
         // right
-        wall[0] = GameController.mapCollision(iUseDoor, position.x + Constants.GHOST_SPEED, position.y, map);
+        wall[0] = GameController.mapCollision(iUseDoor, position.x + speed, position.y, map);
         // up
-        wall[1] = GameController.mapCollision(iUseDoor, position.x, position.y - Constants.GHOST_SPEED, map);
+        wall[1] = GameController.mapCollision(iUseDoor, position.x, position.y - speed, map);
         // left
-        wall[2] = GameController.mapCollision(iUseDoor, position.x - Constants.GHOST_SPEED, position.y, map);
+        wall[2] = GameController.mapCollision(iUseDoor, position.x - speed, position.y, map);
         // down
-        wall[3] = GameController.mapCollision(iUseDoor, position.x, position.y + Constants.GHOST_SPEED, map);
+        wall[3] = GameController.mapCollision(iUseDoor, position.x, position.y + speed, map);
 
-        if (true) { // not frightened mode
+        if (frightenedMode == 0) { // not frightened mode
             int optimalDirection = 3 + 1; // nam ngoai khoang di chuyen duoc
             canMove = true;
 
@@ -101,6 +126,8 @@ public class Ghost {
                     direction = optimalDirection;
                 }
             }
+        } else {
+
         }
 
         if (canMove) {
@@ -219,6 +246,7 @@ public class Ghost {
         isScatter = true;
         iUseDoor = type != GhostManager.GhostType.RED; // red khong the di vao cua'
         animationTimer = 0;
+        frightenedMode = 0;
 
         this.home.setLocation(home);
         this.homeExit.setLocation(homeExit);
@@ -255,4 +283,5 @@ public class Ghost {
     public void switchMode() {
         isScatter = !isScatter;
     }
+
 }

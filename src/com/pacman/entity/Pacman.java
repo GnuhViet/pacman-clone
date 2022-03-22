@@ -10,14 +10,14 @@ import java.awt.event.KeyEvent;
 import java.io.IOException;
 
 public class Pacman extends JLabel{
-
     private int direction;
     Point position;
 
-    //
+    // timer
     private int animationTimer;
+    private int energizerTimer;
 
-    //
+    // ......
     SpriteSheet pacmanSprite;
     SpriteSheet pacmanDeadSprite;
 
@@ -46,6 +46,10 @@ public class Pacman extends JLabel{
 
     public int getDirection() {
         return direction;
+    }
+
+    public int getEnergizerTimer() {
+        return energizerTimer;
     }
 
     public void update(int key, Constants.Cell[][] map) {
@@ -94,12 +98,28 @@ public class Pacman extends JLabel{
             }
         }
 
+
+        // portal... (x)
         if (position.x <= -Constants.CELL_SIZE) {
             position.x = Constants.CELL_SIZE * Constants.MAP_WIDTH - Constants.PACMAN_SPEED;
         }
         else if (position.x >= Constants.CELL_SIZE * Constants.MAP_WIDTH) {
             position.x = Constants.PACMAN_SPEED - Constants.CELL_SIZE;
         }
+
+        // eat energizer
+        int px = (int) Math.round(position.x / (double) (Constants.CELL_SIZE));
+        int py = (int) Math.round(position.y / (double) (Constants.CELL_SIZE));
+
     }
 
+    public void updateEnergizer(Constants.Cell mapItem) {
+        if (mapItem == Constants.Cell.Energizer) {
+            energizerTimer = Constants.ENERGIZER_DURATION / Constants.FPS;
+        }
+    }
+
+    public void reduceEnergizerTimer() {
+        energizerTimer = Math.max(0, energizerTimer-1);
+    }
 }
