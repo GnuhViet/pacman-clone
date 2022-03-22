@@ -7,18 +7,17 @@ import com.pacman.utils.Constants;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 public class Pacman extends JLabel{
-
     private int direction;
     Point position;
 
-    //
+    // timer
     private int animationTimer;
+    private int energizerTimer;
 
-    //
+    // ......
     SpriteSheet pacmanSprite;
     SpriteSheet pacmanDeadSprite;
 
@@ -35,7 +34,6 @@ public class Pacman extends JLabel{
         g2d.drawImage(pacmanSprite.grabImage(direction, frame), position.x, position.y, null);
 
         animationTimer = (animationTimer + 1) % (Constants.PACMAN_ANIMATION_SPEED * Constants.PACMAN_ANIMATION_FRAMES);
-
     }
 
     public void setPosition(int x, int y) {
@@ -44,6 +42,14 @@ public class Pacman extends JLabel{
 
     public Point getPosition() {
         return position;
+    }
+
+    public int getDirection() {
+        return direction;
+    }
+
+    public int getEnergizerTimer() {
+        return energizerTimer;
     }
 
     public void update(int key, Constants.Cell[][] map) {
@@ -60,20 +66,17 @@ public class Pacman extends JLabel{
         wall[3] = GameController.mapCollision(false, position.x, position.y + Constants.PACMAN_SPEED, map);
 
         if (key == KeyEvent.VK_RIGHT) {
-            if (!wall[0])
+            if (!wall[0]) /// neu co tuong thi khong di duoc
                 direction = 0;
         }
-
         if (key == KeyEvent.VK_UP) {
             if (!wall[1])
                 direction = 1;
         }
-
         if (key == KeyEvent.VK_LEFT) {
             if (!wall[2])
                 direction = 2;
         }
-
         if (key == KeyEvent.VK_DOWN) {
             if (!wall[3])
                 direction = 3;
@@ -95,12 +98,28 @@ public class Pacman extends JLabel{
             }
         }
 
+
+        // portal... (x)
         if (position.x <= -Constants.CELL_SIZE) {
             position.x = Constants.CELL_SIZE * Constants.MAP_WIDTH - Constants.PACMAN_SPEED;
         }
         else if (position.x >= Constants.CELL_SIZE * Constants.MAP_WIDTH) {
             position.x = Constants.PACMAN_SPEED - Constants.CELL_SIZE;
         }
+
+        // eat energizer
+        int px = (int) Math.round(position.x / (double) (Constants.CELL_SIZE));
+        int py = (int) Math.round(position.y / (double) (Constants.CELL_SIZE));
+
     }
 
+    public void updateEnergizer(Constants.Cell mapItem) {
+        if (mapItem == Constants.Cell.Energizer) {
+            energizerTimer = Constants.ENERGIZER_DURATION / Constants.FPS;
+        }
+    }
+
+    public void reduceEnergizerTimer() {
+        energizerTimer = Math.max(0, energizerTimer-1);
+    }
 }

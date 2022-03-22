@@ -15,10 +15,20 @@ public interface Constants {
     public static final int PACMAN_SPEED = 2;
 
     public static final int GHOST_SPEED = 2;
+    public static final int GHOST_FRIGHTENED_SPEED = 1;
     public static final int GHOST_ANIMATION_SPEED = 10;
     public static final int GHOST_ANIMATION_FRAMES = 2;
 
+    public static final int GHOST_PINK_CHASE = 4;
+    public static final int GHOST_BLUE_CHASE = 2;
+    public static final int GHOST_ORANGE_CHASE = 5;
+
     public static final int FPS = 60;
+
+    public static final int ENERGIZER_DURATION = 8 * FPS;
+    public static final int CHASE_DURATION = 20; //second
+    public static final int LONG_SCATTER_DURATION = 7;
+    public static final int SHORT_SCATTER_DURATION = 5;
 
     enum Cell {
         Door,
