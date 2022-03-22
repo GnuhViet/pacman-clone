@@ -1,6 +1,7 @@
 package com.pacman.controller;
 
 import com.pacman.entity.Ghost;
+import com.pacman.entity.Map;
 import com.pacman.entity.Pacman;
 import com.pacman.utils.Constants;
 
@@ -49,9 +50,9 @@ public class GhostManager {
         return ghosts[type.ordinal()];
     }
 
-    public void update(Constants.Cell[][] mapInput, Pacman pacman) {
+    public void update(Map map, Pacman pacman) {
         for (int i = 0; i < NUMBER_OF_GHOSTS; i++) {
-            ghosts[i].update(mapInput, pacman, ghosts[0].getPosition());
+            ghosts[i].update(map, pacman, ghosts[0].getPosition());
         }
     }
 

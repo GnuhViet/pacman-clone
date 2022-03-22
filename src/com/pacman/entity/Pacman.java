@@ -1,6 +1,5 @@
 package com.pacman.entity;
 
-import com.pacman.controller.GameController;
 import com.pacman.utils.BufferedImageLoader;
 import com.pacman.utils.Constants;
 
@@ -52,18 +51,18 @@ public class Pacman extends JLabel{
         return energizerTimer;
     }
 
-    public void update(int key, Constants.Cell[][] map) {
+    public void update(int key, Map map) {
         boolean[] wall = new boolean[4];
 
         // check 4 ben xung quanh co la tuong khong
         // right
-        wall[0] = GameController.mapCollision(false, position.x + Constants.PACMAN_SPEED, position.y, map);
+        wall[0] = map.mapCollision(false, position.x + Constants.PACMAN_SPEED, position.y);
         // up
-        wall[1] = GameController.mapCollision(false, position.x, position.y - Constants.PACMAN_SPEED, map);
+        wall[1] = map.mapCollision(false, position.x, position.y - Constants.PACMAN_SPEED);
         // left
-        wall[2] = GameController.mapCollision(false, position.x - Constants.PACMAN_SPEED, position.y, map);
+        wall[2] = map.mapCollision(false, position.x - Constants.PACMAN_SPEED, position.y);
         // down
-        wall[3] = GameController.mapCollision(false, position.x, position.y + Constants.PACMAN_SPEED, map);
+        wall[3] = map.mapCollision(false, position.x, position.y + Constants.PACMAN_SPEED);
 
         if (key == KeyEvent.VK_RIGHT) {
             if (!wall[0]) /// neu co tuong thi khong di duoc
@@ -114,7 +113,7 @@ public class Pacman extends JLabel{
     }
 
     public void updateEnergizer(Constants.Cell mapItem) {
-        if (mapItem == Constants.Cell.Energizer) {
+        if (Constants.Cell.Energizer == mapItem) {
             energizerTimer = Constants.ENERGIZER_DURATION / Constants.FPS;
         }
     }

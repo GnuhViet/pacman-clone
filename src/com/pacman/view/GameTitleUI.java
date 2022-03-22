@@ -1,5 +1,6 @@
 package com.pacman.view;
 
+import com.pacman.controller.GameController;
 import com.pacman.utils.Constants;
 
 import javax.swing.*;
@@ -14,6 +15,7 @@ public class GameTitleUI {
     private JFrame window;
     private ImagePanel titleUI;
     private GameView gameUI;
+    private GameController controller;
     private Container con;
 
     public GameTitleUI() {
@@ -128,7 +130,13 @@ public class GameTitleUI {
 
                 con.add(gameUI);
 
-                gameUI.startGameThread();
+                try {
+                    controller = new GameController(gameUI);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+
+                controller.startGameThread();
                 return;
             }
 

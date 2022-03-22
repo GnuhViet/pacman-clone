@@ -1,78 +1,132 @@
 package com.pacman.controller;
 
+import com.pacman.entity.Map;
+import com.pacman.entity.Pacman;
 import com.pacman.utils.Constants;
+import com.pacman.utils.FileUtils;
+import com.pacman.view.GameView;
 
-public class GameController {
+import java.io.IOException;
 
+public class GameController implements Runnable{
+    private FileUtils data;
+    private Pacman pacman;
+    private GhostManager ghostManager;
+    private Map map;
+    private GameView view;
 
-    
-    public static boolean isWin(Constants.Cell[][] map) {
-        for (int i = 0; i < Constants.MAP_WIDTH; i++) {
-            for (int j = 0; j < Constants.MAP_HEIGHT; j++) {
-                if (map[i][j] == Constants.Cell.Pellet || map[i][j] == Constants.Cell.Energizer) {
-                    return false;
+    private int key;
+    boolean isWin;
+
+    Thread gameThread;
+
+    ///////
+    // Runnable method implements
+    //////
+    @Override
+    public void run() {
+        // 1 sec = 1000000000 nanosec
+        // draw 60fps
+        double drawInterval = 1000000000/Constants.FPS; // drawn 1 frame in 0.0166sec
+        double delta = 0;
+        long lastTime = System.nanoTime();
+        long currentTime;
+
+        // count fps
+        long timer = 0;
+        int drawCount = 0;
+
+        while (!isWin) {
+            // draw 60fps
+            currentTime = System.nanoTime();
+            delta += (currentTime - lastTime) / drawInterval;
+            timer += currentTime - lastTime;
+            lastTime = currentTime;
+
+            if (delta >= 1) {// delta >= 1 mean past 0.0166 sec
+
+                // 1. update pacman position
+                pacman.update(view.getKey(), map);
+
+                // get pacman position in map
+                int x = (int) Math.round(pacman.getPosition().x / (double) (Constants.CELL_SIZE));
+                int y = (int) Math.round(pacman.getPosition().y / (double) (Constants.CELL_SIZE));
+
+                // kiem tra xem co o trong map khong...
+                if (0 < x && Constants.MAP_HEIGHT > y && Constants.MAP_WIDTH > x) {
+                    // 2. check eat energizer
+                    pacman.updateEnergizer(map.getMapItem(x, y));
+                    // 3. update map
+                    mapUpdate(x, y);
                 }
+
+                // 4. update ghost
+                ghostManager.update(map, pacman);
+                // 5. update view
+                view.update(pacman, ghostManager, map);
+                // 6. Check win
+                isWin = isWin();
+
+                // reset delta
+                delta--;
+                // count frame
+                drawCount++;
+            }
+
+            // print fps and update phase
+            if (timer >= 1000000000) {
+                //System.out.println("Timer: " + pacman.getEnergizerTimer());
+                if (pacman.getEnergizerTimer() > 0) {
+                    pacman.reduceEnergizerTimer();
+                }
+                //System.out.println("FPS:" + drawCount);
+                ghostManager.phaseUpdate();
+                drawCount = 0;
+                timer = 0;
             }
         }
-        return true;
     }
 
-    public static Constants.Cell mapUpdate(int x, int y, Constants.Cell[][] map) {
-        if (Constants.Cell.Energizer == map[y][x]) {
-            return Constants.Cell.Empty;
+    public GameController(GameView view) throws IOException {
+        data = new FileUtils();
+        pacman = new Pacman();
+        ghostManager = new GhostManager();
+        map = new Map(data.getMap(pacman, ghostManager));
+        this.view = view;
+
+        initGame();
+    }
+
+    public void initGame() {
+        // update view
+        view.update(pacman, ghostManager, map);
+
+        // move to right pos in map
+        int pacmanX = (pacman.getPosition().x * Constants.CELL_SIZE);
+        int pacmanY = (pacman.getPosition().y * Constants.CELL_SIZE);
+        pacman.setPosition(pacmanX, pacmanY);
+
+        // move to right pos in map
+        ghostManager.initPos();
+        ghostManager.reset();
+    }
+
+    public boolean isWin() {
+        return map.isClear();
+    }
+
+    public void mapUpdate(int x, int y) {
+        if (Constants.Cell.Energizer == map.getMapItem(y, x)) {
+            map.setMap(x, y, Constants.Cell.Empty);
+            return;
         }
-        return Constants.Cell.Empty;
+        map.setMap(x, y, Constants.Cell.Empty);
     }
 
-    public static boolean mapCollision(boolean iUseDoor, int iX, int iY, Constants.Cell[][] map) {
-        boolean output = false;
 
-        double cellX = iX / (double)(Constants.CELL_SIZE);
-        double cellY = iY / (double)(Constants.CELL_SIZE);
-
-        for (int i = 0; i < 4; i++) {
-            int x = 0;
-            int y = 0;
-
-            switch (i) {
-                case 0://TOP LEFT CELL
-                {
-                    x = (int)Math.floor(cellX);
-                    y = (int)Math.floor(cellY);
-                    break;
-                }
-                case 1: //TOP RIGHT
-                {
-                    x = (int)Math.ceil(cellX);
-                    y = (int)Math.floor(cellY);
-                    break;
-                }
-                case 2:
-                {
-                    x = (int)Math.floor(cellX);
-                    y = (int)Math.ceil(cellY);
-                    break;
-                }
-                case 3:
-                {
-                    x = (int)Math.ceil(cellX);
-                    y = (int)Math.ceil(cellY);
-                }
-            }
-
-            // kiem tra xem vi tri co trong map khong
-            if (0 <= x && 0 <= y && Constants.MAP_HEIGHT > y && Constants.MAP_WIDTH > x)
-            {
-                if (Constants.Cell.Wall == map[y][x]) {
-                    output = true;
-                }
-                else if (iUseDoor == false && Constants.Cell.Door == map[y][x]) {
-                    output = true;
-                }
-            }
-        }
-
-        return output;
+    public void startGameThread() {
+        gameThread = new Thread(this);
+        gameThread.start();
+        isWin = false;
     }
-
 }

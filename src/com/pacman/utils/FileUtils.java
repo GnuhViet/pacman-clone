@@ -1,7 +1,6 @@
 package com.pacman.utils;
 
 import com.pacman.controller.GhostManager;
-import com.pacman.entity.Ghost;
 import com.pacman.entity.Pacman;
 
 public class FileUtils {
