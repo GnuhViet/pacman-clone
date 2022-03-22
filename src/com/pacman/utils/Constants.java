@@ -24,6 +24,10 @@ public interface Constants {
 
     public static final int FPS = 60;
 
+    public static final int CHASE_DURATION = 20; // second
+    public static final int LONG_SCATTER_DURATION = 7;
+    public static final int SHORT_SCATTER_DURATION = 5;
+
     enum Cell {
         Door,
         Empty,

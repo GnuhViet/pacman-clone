@@ -15,7 +15,7 @@ public class FileUtils {
             " ####.### # ###.#### ",
             "    #.#   0   #.#    ",
             "#####.# ##=## #.#####",
-            "     .  #123#  .     ",
+            "     .  #213#  .     ",
             "#####.# ##### #.#####",
             "    #.#       #.#    ",
             " ####.# ##### #.#### ",
@@ -34,7 +34,6 @@ public class FileUtils {
 
         for (int i = 0; i < Constants.MAP_WIDTH; i++) {
             String[] sub = mapSketch[i].split("");
-
             for (int j = 0; j < Constants.MAP_HEIGHT; j++) {
                 mapOutput[i][j] = Constants.Cell.Empty;
                 switch (sub[j]) {
@@ -48,19 +47,19 @@ public class FileUtils {
                         mapOutput[i][j] = Constants.Cell.Pellet;
                         break;
                     case "P":
-                        pacman.setPosition(j + 1,i + 1);
+                        pacman.setPosition(j, i);
                         break;
                     case "0":
-                        ghost.setPosition(GhostManager.GhostType.RED, j + 1, i + 1);
+                        ghost.setPosition(GhostManager.GhostType.RED, j, i);
                         break;
                     case "1":
-                        ghost.setPosition(GhostManager.GhostType.PINK, j + 1, i + 1);
+                        ghost.setPosition(GhostManager.GhostType.PINK, j, i);
                         break;
                     case "2":
-                        ghost.setPosition(GhostManager.GhostType.BLUE, j + 1, i + 1);
+                        ghost.setPosition(GhostManager.GhostType.BLUE, j, i);
                         break;
                     case "3":
-                        ghost.setPosition(GhostManager.GhostType.ORANGE, j + 1, i + 1);
+                        ghost.setPosition(GhostManager.GhostType.ORANGE, j, i);
                         break;
                     case "o":
                         mapOutput[i][j] = Constants.Cell.Energizer;

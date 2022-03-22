@@ -30,7 +30,9 @@ public class GameView extends JPanel implements Runnable, KeyListener{
 
     boolean isWin;
 
+    ///////
     // JPanel methods override
+    ///////
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -46,7 +48,12 @@ public class GameView extends JPanel implements Runnable, KeyListener{
         g2d.dispose();
     }
 
+    ///////
     // Runnable method implements
+    //////
+    /*
+     *  BAT DAU GAME
+     */
     @Override
     public void run() {
         // 1 sec = 1000000000 nanosec
@@ -55,20 +62,20 @@ public class GameView extends JPanel implements Runnable, KeyListener{
         double delta = 0;
         long lastTime = System.nanoTime();
         long currentTime;
+
         // count fps
         long timer = 0;
         int drawCount = 0;
-
 
         while (!isWin) {
             // draw 60fps
             currentTime = System.nanoTime();
             delta += (currentTime - lastTime) / drawInterval;
             timer += currentTime - lastTime;
-
             lastTime = currentTime;
 
-            if (delta >= 1) {// delta >= 1 mean past 0.0166 sec
+            if (delta >= 1) {
+                // delta >= 1 mean past 0.0166 sec
                 // 1. update pacman position
                 pacman.update(key, mapInput);
 
@@ -109,19 +116,26 @@ public class GameView extends JPanel implements Runnable, KeyListener{
                 offTime = 0;
             }
 
-            // print fps
+            // print fps and update phase
             if (timer >= 1000000000) {
-                //System.out.println("FPS:" + drawCount);
+                System.out.println("FPS:" + drawCount);
+                ghostManager.phaseUpdate();
                 drawCount = 0;
                 timer = 0;
             }
         }
     }
 
+    /*
+     * KET THUC GAME
+     */
     public void gameStop() {
 
     }
+
+    ///////
     // KeyListener method implements
+    //////
     @Override
     public void keyTyped(KeyEvent e) {}
 
@@ -157,10 +171,11 @@ public class GameView extends JPanel implements Runnable, KeyListener{
         mapInput = data.getMap(pacman, ghostManager); //TODO .. chinh sua lai
 
         // move to right pos in map
-        int pacmanX = ((pacman.getPosition().x * Constants.CELL_SIZE) - Constants.CELL_SIZE);
-        int pacmanY = ((pacman.getPosition().y * Constants.CELL_SIZE) - Constants.CELL_SIZE);
+        int pacmanX = (pacman.getPosition().x * Constants.CELL_SIZE);
+        int pacmanY = (pacman.getPosition().y * Constants.CELL_SIZE);
         pacman.setPosition(pacmanX, pacmanY);
 
+        // move to right pos in map
         ghostManager.initPos();
         ghostManager.reset();
     }
@@ -170,11 +185,8 @@ public class GameView extends JPanel implements Runnable, KeyListener{
         for (int a = 0; a < Constants.MAP_WIDTH; a++){
             for (int b = 0; b < Constants.MAP_HEIGHT; b++) {
 
-                int x = b + 1;
-                int y = a + 1;
-
-                int xPos = ((x * Constants.CELL_SIZE) - Constants.CELL_SIZE);
-                int yPos = ((y * Constants.CELL_SIZE) - Constants.CELL_SIZE);
+                int xPos = ((b * Constants.CELL_SIZE));
+                int yPos = ((a * Constants.CELL_SIZE));
 
                 switch (mapInput[a][b]) {
                     case Door: {
@@ -224,7 +236,8 @@ public class GameView extends JPanel implements Runnable, KeyListener{
                             }
                         }
 
-                        int pos = (down + 2 * (left + 2 * (right + 2 * up)));
+                        /////// sprite pattern
+                        int pos = down + 2*left + 4*right + 8*up;
 
                         g2d.drawImage(mapSprite.grabImage(0, pos),  xPos, yPos, null);
                     }

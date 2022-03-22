@@ -7,7 +7,6 @@ import com.pacman.utils.Constants;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 public class Pacman extends JLabel{
@@ -35,7 +34,6 @@ public class Pacman extends JLabel{
         g2d.drawImage(pacmanSprite.grabImage(direction, frame), position.x, position.y, null);
 
         animationTimer = (animationTimer + 1) % (Constants.PACMAN_ANIMATION_SPEED * Constants.PACMAN_ANIMATION_FRAMES);
-
     }
 
     public void setPosition(int x, int y) {
@@ -64,20 +62,17 @@ public class Pacman extends JLabel{
         wall[3] = GameController.mapCollision(false, position.x, position.y + Constants.PACMAN_SPEED, map);
 
         if (key == KeyEvent.VK_RIGHT) {
-            if (!wall[0])
+            if (!wall[0]) /// neu co tuong thi khong di duoc
                 direction = 0;
         }
-
         if (key == KeyEvent.VK_UP) {
             if (!wall[1])
                 direction = 1;
         }
-
         if (key == KeyEvent.VK_LEFT) {
             if (!wall[2])
                 direction = 2;
         }
-
         if (key == KeyEvent.VK_DOWN) {
             if (!wall[3])
                 direction = 3;
