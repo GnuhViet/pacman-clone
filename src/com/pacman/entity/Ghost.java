@@ -1,6 +1,5 @@
 package com.pacman.entity;
 
-import com.pacman.controller.GameController;
 import com.pacman.controller.GhostManager;
 import com.pacman.utils.BufferedImageLoader;
 import com.pacman.utils.Constants;
@@ -9,7 +8,7 @@ import java.awt.*;
 import java.io.IOException;
 
 public class Ghost {
-    private GhostManager.GhostType type;
+    private final GhostManager.GhostType type;
     private int direction;
     private boolean iUseDoor;
     private boolean isScatter;
@@ -62,7 +61,7 @@ public class Ghost {
         return position;
     }
 
-    public void update(Constants.Cell[][] map, Pacman pacman, Point redGhostPosition) {
+    public void update(Map map, Pacman pacman, Point redGhostPosition) {
         int pacmanDirection = pacman.getDirection();
         Point pacmanPos = pacman.getPosition(); // TODO
 
@@ -88,15 +87,15 @@ public class Ghost {
         // check 4 ben xung quanh co la tuong khong
         boolean[] wall = new boolean[4];
         // right
-        wall[0] = GameController.mapCollision(iUseDoor, position.x + speed, position.y, map);
+        wall[0] = map.mapCollision(iUseDoor, position.x + speed, position.y);
         // up
-        wall[1] = GameController.mapCollision(iUseDoor, position.x, position.y - speed, map);
+        wall[1] = map.mapCollision(iUseDoor, position.x, position.y - speed);
         // left
-        wall[2] = GameController.mapCollision(iUseDoor, position.x - speed, position.y, map);
+        wall[2] = map.mapCollision(iUseDoor, position.x - speed, position.y);
         // down
-        wall[3] = GameController.mapCollision(iUseDoor, position.x, position.y + speed, map);
+        wall[3] = map.mapCollision(iUseDoor, position.x, position.y + speed);
 
-        if (frightenedMode == 0) { // not frightened mode
+        if (true) { // not frightened mode
             int optimalDirection = 3 + 1; // nam ngoai khoang di chuyen duoc
             canMove = true;
 
@@ -126,8 +125,6 @@ public class Ghost {
                     direction = optimalDirection;
                 }
             }
-        } else {
-
         }
 
         if (canMove) {
@@ -283,5 +280,4 @@ public class Ghost {
     public void switchMode() {
         isScatter = !isScatter;
     }
-
 }
