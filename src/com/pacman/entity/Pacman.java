@@ -105,11 +105,6 @@ public class Pacman extends JLabel{
         else if (position.x >= Constants.CELL_SIZE * Constants.MAP_WIDTH) {
             position.x = Constants.PACMAN_SPEED - Constants.CELL_SIZE;
         }
-
-        // eat energizer
-        int px = (int) Math.round(position.x / (double) (Constants.CELL_SIZE));
-        int py = (int) Math.round(position.y / (double) (Constants.CELL_SIZE));
-
     }
 
     public void updateEnergizer(Constants.Cell mapItem) {

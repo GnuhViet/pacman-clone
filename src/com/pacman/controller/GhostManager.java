@@ -50,6 +50,12 @@ public class GhostManager {
         return ghosts[type.ordinal()];
     }
 
+    public void updateFrightened(Pacman pacman) {
+        for (int i = 0; i < NUMBER_OF_GHOSTS; i++) {
+            ghosts[i].updateFrightened(pacman);
+        }
+    }
+
     public void update(Map map, Pacman pacman) {
         for (int i = 0; i < NUMBER_OF_GHOSTS; i++) {
             ghosts[i].update(map, pacman, ghosts[0].getPosition());
