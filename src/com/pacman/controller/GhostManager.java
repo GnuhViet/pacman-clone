@@ -30,8 +30,14 @@ public class GhostManager {
     }
 
     private final Ghost[] ghosts;
+    private int[] startX; // vi tri tinh theo diem anh
+    private int[] startY;
+
 
     public GhostManager() throws IOException {
+        startX = new int[NUMBER_OF_GHOSTS];
+        startY = new int[NUMBER_OF_GHOSTS];
+
         ghosts = new Ghost[NUMBER_OF_GHOSTS];
         ghosts[0] = new Ghost(GhostType.RED);
         ghosts[1] = new Ghost(GhostType.PINK);
@@ -39,11 +45,19 @@ public class GhostManager {
         ghosts[3] = new Ghost(GhostType.ORANGE);
     }
 
-    public void reset() {
+    public void reset(boolean isNewGame) {
+        for (int i = 0; i < NUMBER_OF_GHOSTS; i++) {
+            if (isNewGame) {
+                startX[i] = (ghosts[i].getPosition().x * Constants.CELL_SIZE);
+                startY[i] = (ghosts[i].getPosition().y * Constants.CELL_SIZE);
+            }
+            ghosts[i].setPosition(startX[i], startY[i]);
+        }
         // blue la house, red la exit
         for (int i = 0; i < NUMBER_OF_GHOSTS; i++) {
             ghosts[i].reset(ghosts[1].getPosition(), ghosts[0].getPosition());
         }
+        phaseCount = 1;
     }
 
     public Ghost getGhost(GhostType type) {
@@ -60,6 +74,15 @@ public class GhostManager {
         for (int i = 0; i < NUMBER_OF_GHOSTS; i++) {
             ghosts[i].update(map, pacman, ghosts[0].getPosition());
         }
+    }
+
+    public boolean isKillPacman() {
+        for (int i = 0; i < NUMBER_OF_GHOSTS; i++) {
+            if (ghosts[i].touchPacman()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void phaseUpdate() {
@@ -118,13 +141,5 @@ public class GhostManager {
 
     public void setPosition(GhostType type, int x, int y) {
         ghosts[type.ordinal()].setPosition(x, y);
-    }
-
-    public void initPos() {
-        for (int i = 0; i < NUMBER_OF_GHOSTS; i++) {
-            int ghostX = (ghosts[i].getPosition().x * Constants.CELL_SIZE);
-            int ghostY = (ghosts[i].getPosition().y * Constants.CELL_SIZE);
-            ghosts[i].setPosition(ghostX, ghostY);
-        }
     }
 }

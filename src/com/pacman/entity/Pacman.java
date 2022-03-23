@@ -12,6 +12,11 @@ public class Pacman extends JLabel{
     private int direction;
     Point position;
 
+    //
+    private boolean isAlive;
+    private int startX;
+    private int startY;
+
     // timer
     private int animationTimer;
     private int energizerTimer;
@@ -21,18 +26,20 @@ public class Pacman extends JLabel{
     SpriteSheet pacmanDeadSprite;
 
     public Pacman() throws IOException {
-        animationTimer = 0;
         position = new Point();
         pacmanSprite = new SpriteSheet(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\Entity\\Pacman32.png"));
         pacmanDeadSprite = new SpriteSheet(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\Entity\\PacmanDeath32.png"));
     }
 
-    public void draw(Graphics2D g2d) {
-        int frame = (int) Math.floor(animationTimer / Constants.PACMAN_ANIMATION_SPEED);
-
-        g2d.drawImage(pacmanSprite.grabImage(direction, frame), position.x, position.y, null);
-
-        animationTimer = (animationTimer + 1) % (Constants.PACMAN_ANIMATION_SPEED * Constants.PACMAN_ANIMATION_FRAMES);
+    public void reset(boolean isNewGame) {
+        if (isNewGame) {
+            startX = (position.x * Constants.CELL_SIZE);
+            startY = (position.y * Constants.CELL_SIZE);
+        }
+        direction = 0;
+        position.setLocation(startX, startY);
+        isAlive = true;
+        animationTimer = 0;
     }
 
     public void setPosition(int x, int y) {
@@ -49,6 +56,22 @@ public class Pacman extends JLabel{
 
     public int getEnergizerTimer() {
         return energizerTimer;
+    }
+
+    public void setAlive(boolean alive) {
+        isAlive = alive;
+    }
+
+    public boolean isAlive() {
+        return isAlive;
+    }
+
+    public void draw(Graphics2D g2d) {
+        int frame = (int) Math.floor(animationTimer / Constants.PACMAN_ANIMATION_SPEED);
+
+        g2d.drawImage(pacmanSprite.grabImage(direction, frame), position.x, position.y, null);
+
+        animationTimer = (animationTimer + 1) % (Constants.PACMAN_ANIMATION_SPEED * Constants.PACMAN_ANIMATION_FRAMES);
     }
 
     public void update(int key, Map map) {
