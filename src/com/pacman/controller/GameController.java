@@ -56,6 +56,7 @@ public class GameController implements Runnable{
                 if (0 < x && Constants.MAP_HEIGHT > y && Constants.MAP_WIDTH > x) {
                     // 2. check eat energizer
                     pacman.updateEnergizer(map.getMapItem(x, y));
+                    ghostManager.updateFrightened(pacman);
                     // 3. update map
                     mapUpdate(x, y);
                 }
