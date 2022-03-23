@@ -5,14 +5,15 @@ import com.pacman.utils.Constants;
 public class Map {
     private Constants.Cell[][] map;
     private boolean off = false;
-    private long offTime;
-    private long onTime;
 
-    public Map(Constants.Cell[][] map) {
+    public Map() {
+    }
+
+    public void setMap(Constants.Cell[][] map) {
         this.map = map;
     }
 
-    public void setMap(int x, int y, Constants.Cell element) {
+    public void setMapItem(int x, int y, Constants.Cell element) {
         map[y][x] = element;
     }
 
@@ -20,30 +21,13 @@ public class Map {
         return map[y][x];
     }
 
-    public Constants.Cell[][] getMap() {
-        return map;
-    }
 
     public boolean isEnergizerOff() {
         return off;
     }
 
-    public void UpdateEnergizerBlinkTime(long timer) {
-        //for blinking energizer
-        if (off) {
-            offTime += timer;
-        } else {
-            onTime += timer;
-        }
-
-        if (onTime  >= 800000000) {
-            off = true;
-            onTime = 0;
-        }
-        if (offTime >= 800000000) {
-            off = false;
-            offTime = 0;
-        }
+    public void energizerSwitch() {
+        off = !off;
     }
 
     public boolean mapCollision(boolean iUseDoor, int iX, int iY) {

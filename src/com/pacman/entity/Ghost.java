@@ -13,6 +13,7 @@ public class Ghost {
     private int direction;
     private boolean iUseDoor;
     private boolean isScatter;
+    private boolean touchPacman;
     private Point position;
     private Point target;
     private final Point home;
@@ -44,17 +45,16 @@ public class Ghost {
 
         if (frightenedMode == 0) {
             g2d.drawImage(ghostSprite.grabImage(i, frame), position.x, position.y, null);      //body
-            g2d.drawImage(ghostSprite.grabImage(5, direction), position.x, position.y, null); // eyes
-            return;
-        }
-        if (frightenedMode == 2) {
             g2d.drawImage(ghostSprite.grabImage(6, direction), position.x, position.y, null); // eyes
             return;
         }
-        // normal
-        g2d.drawImage(ghostSprite.grabImage(4, frame), position.x, position.y, null);  //body
-        g2d.drawImage(ghostSprite.grabImage(5, 4), position.x, position.y, null); // eyes
-
+        if (frightenedMode == 1) {
+            g2d.drawImage(ghostSprite.grabImage(4, frame), position.x, position.y, null);  //body
+            g2d.drawImage(ghostSprite.grabImage(6, 4), position.x, position.y, null); // eyes
+            return;
+        }
+        // go home.........
+        g2d.drawImage(ghostSprite.grabImage(7, direction), position.x, position.y, null); // eyes
     }
 
     public void setPosition(int x, int y) {
@@ -64,7 +64,7 @@ public class Ghost {
     public Point getPosition() {
         return position;
     }
-
+    // TODO cham gan hon
     public boolean pacmanCollision(Point pacmanPosition) {
         if (position.x > pacmanPosition.x - Constants.CELL_SIZE && position.x < pacmanPosition.x + Constants.CELL_SIZE) {
             if (position.y > pacmanPosition.y - Constants.CELL_SIZE && position.y < pacmanPosition.y + Constants.CELL_SIZE) {
@@ -106,7 +106,6 @@ public class Ghost {
         int pacmanDirection = pacman.getDirection();
         Point pacmanPos = pacman.getPosition(); // TODO
 
-        boolean canMove = false; // co di duoc khong ?
         int availableWay = 0;    // huong dang sau khong phai la huong di duoc
 
         int speed = Constants.GHOST_SPEED;
@@ -129,13 +128,14 @@ public class Ghost {
         wall[3] = map.mapCollision(iUseDoor, position.x, position.y + speed); // down
 
         if (frightenedMode != 1) { // not frightened mode
+
             int optimalDirection = 3 + 1; // nam ngoai khoang di chuyen duoc
-            canMove = true;
 
             for (int a = 0; a < 4; a++) {
                 if (a == (2 + this.direction) % 4) { // ghost khong quay dau
                     continue;
-                } else if (!wall[a]) {
+                }
+                else if (!wall[a]) {
                     if (4 == optimalDirection) {
                         optimalDirection = a;
                     }
@@ -147,9 +147,11 @@ public class Ghost {
                     }
                 }
             }
+
             if (1 < availableWay) {
                 direction = optimalDirection;
-            } else {
+            }
+            else {
                 if (4 == optimalDirection) { // truong hop o home
                     direction = (2 + direction) % 4;
                 } else {
@@ -157,7 +159,6 @@ public class Ghost {
                 }
             }
         } else {
-            canMove = true;
             int ranNum = ThreadLocalRandom.current().nextInt(0, 4);
             for (int a = 0; a < 4; a++) {
                 if (a == (2 + this.direction) % 4) { // ghost khong quay dau
@@ -178,30 +179,28 @@ public class Ghost {
         }
 
         // check direction
-        if (canMove) {
-            switch (direction) {
-                case 0: //RIGHT
-                    position.x += speed;
-                    break;
-                case 1: //UP
-                    position.y -= speed;
-                    break;
-                case 2: //LEFT
-                    position.x -= speed;
-                    break;
-                case 3: //DOWN
-                    position.y += speed;
-            }
-            if (-Constants.CELL_SIZE >= position.x) {
-                position.x = Constants.CELL_SIZE * Constants.MAP_WIDTH - speed;
-            } else if (Constants.CELL_SIZE * Constants.MAP_WIDTH <= position.x) {
-                position.x = speed - Constants.CELL_SIZE;
-            }
+        switch (direction) {
+            case 0: //RIGHT
+                position.x += speed;
+                break;
+            case 1: //UP
+                position.y -= speed;
+                break;
+            case 2: //LEFT
+                position.x -= speed;
+                break;
+            case 3: //DOWN
+                position.y += speed;
+        }
+        if (-Constants.CELL_SIZE >= position.x) {
+            position.x = Constants.CELL_SIZE * Constants.MAP_WIDTH - speed;
+        } else if (Constants.CELL_SIZE * Constants.MAP_WIDTH <= position.x) {
+            position.x = speed - Constants.CELL_SIZE;
         }
 
         if (pacmanCollision(pacmanPos)) {
             if (0 == frightenedMode) {
-                // pacman set dead
+                touchPacman = true;
             } else {
                 iUseDoor = true;
                 fixGrid();
@@ -209,6 +208,10 @@ public class Ghost {
                 target.setLocation(home);
             }
         }
+    }
+
+    public boolean touchPacman() {
+        return touchPacman;
     }
 
     public void updateTarget(Point pacmanPos, int pacmanDirection, Point redGhostPosition) {
@@ -304,12 +307,11 @@ public class Ghost {
     }
 
     public void reset(Point home, Point homeExit) {
-
         isScatter = true;
         iUseDoor = type != GhostManager.GhostType.RED; // red khong the di vao cua'
+        touchPacman = false;
         animationTimer = 0;
         frightenedMode = 0;
-
         this.home.setLocation(home);
         this.homeExit.setLocation(homeExit);
         target.setLocation(this.homeExit);
