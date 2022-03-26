@@ -3,7 +3,7 @@ package com.pacman.view;
 import com.pacman.controller.GhostManager;
 import com.pacman.entity.Map;
 import com.pacman.entity.Pacman;
-import com.pacman.entity.SpriteSheet;
+import com.pacman.entity.PixelNumber;
 import com.pacman.utils.BufferedImageLoader;
 import com.pacman.utils.Constants;
 
@@ -12,13 +12,18 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
 
-public class GameView extends JPanel implements KeyListener{
-    private SpriteSheet mapSprite;
+public class GameView extends JPanel implements KeyListener {
     private Map map;
     private Pacman pacman;
     private GhostManager ghostManager;
+    private PixelNumber pixelNumber;
 
     private int key;
+    private int timer = 3;
+
+    private boolean isReady;
+    private boolean isLose;
+    private boolean switchColor;
 
     ///////
     // JPanel methods override
@@ -28,9 +33,15 @@ public class GameView extends JPanel implements KeyListener{
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
         try {
-            this.drawMap(g2d);
+            map.drawMap(g2d);
             pacman.draw(g2d);
             ghostManager.draw(g2d);
+            if (!isReady) {
+                this.drawReady(g2d);
+            }
+            if (isLose) {
+                drawDead(g2d);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -42,7 +53,8 @@ public class GameView extends JPanel implements KeyListener{
     // KeyListener method implements
     //////
     @Override
-    public void keyTyped(KeyEvent e) {}
+    public void keyTyped(KeyEvent e) {
+    }
 
     @Override
     public void keyPressed(KeyEvent e) {
@@ -50,7 +62,8 @@ public class GameView extends JPanel implements KeyListener{
     }
 
     @Override
-    public void keyReleased(KeyEvent e) {}
+    public void keyReleased(KeyEvent e) {
+    }
 
     ////////////////////////
     /////// GameView methods
@@ -62,9 +75,13 @@ public class GameView extends JPanel implements KeyListener{
     private void initGame() throws IOException {
         this.setOpaque(true);
         this.setBackground(Color.BLACK);
-
+        isLose = false;
+        switchColor = true;
+        isReady = false;
         // load sprite
-        mapSprite = new SpriteSheet(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\Entity\\Map32.png"));
+
+        pixelNumber = new PixelNumber();
+        timer = 4;
     }
 
     public void update(Pacman pacman, GhostManager ghostManager, Map map) {
@@ -78,69 +95,39 @@ public class GameView extends JPanel implements KeyListener{
         return key;
     }
 
-    private void drawMap(Graphics2D g2d) throws IOException {
-        for (int a = 0; a < Constants.MAP_WIDTH; a++){
-            for (int b = 0; b < Constants.MAP_HEIGHT; b++) {
-
-                int xPos = ((b * Constants.CELL_SIZE));
-                int yPos = ((a * Constants.CELL_SIZE));
-
-                switch (map.getMapItem(b, a)) {
-                    case Door: {
-                        g2d.drawImage(mapSprite.grabImage(1,2),  xPos, yPos, null);
-                        break;
-                    }
-                    case Energizer: {
-                        if (map.isEnergizerOff()) {
-                            g2d.drawImage(mapSprite.grabImage(1,3),  xPos, yPos, null);
-                            break;
-                        }
-                        g2d.drawImage(mapSprite.grabImage(1,1),  xPos, yPos, null);
-                        break;
-                    }
-                    case Pellet: {
-                        g2d.drawImage(mapSprite.grabImage(1,0),  xPos, yPos, null);
-                        break;
-                    }
-                    case Wall: {
-
-                        int up = 0;         // b la truc x
-                        int left = 0;       // a la truc y
-                        int down = 0;
-                        int right = 0;
-
-                        if (b < Constants.MAP_WIDTH - 1) {
-                            if (Constants.Cell.Wall == map.getMapItem(b + 1, a)) {
-                                right = 1; // right
-                            }
-                        }
-
-                        if (a > 0) {
-                            if (Constants.Cell.Wall == map.getMapItem(b, a - 1)) {
-                                up = 1; // up
-                            }
-                        }
-
-                        if (a < Constants.MAP_HEIGHT - 1) {
-                            if (Constants.Cell.Wall == map.getMapItem(b, a + 1)) {
-                                down = 1; // dow
-                            }
-                        }
-
-                        if (b > 0) {
-                            if (Constants.Cell.Wall == map.getMapItem(b - 1, a)) {
-                                left = 1; // left
-                            }
-                        }
-
-                        /////// sprite pattern
-                        int pos = down + 2*left + 4*right + 8*up;
-
-                        g2d.drawImage(mapSprite.grabImage(0, pos),  xPos, yPos, null);
-                    }
-                }
-            }
-        }
+    public void setLose(boolean lose) {
+        this.isLose = lose;
     }
 
+    public void setReady(boolean ready) {
+        isReady = ready;
+    }
+
+    public void decreaseTimer() {
+        timer-=1;
+    }
+
+    public void switchColor() {
+        switchColor = !switchColor;
+    }
+
+
+
+    private void drawReady(Graphics2D g2d) throws IOException {
+        int d = Constants.CELL_SIZE * Constants.MAP_WIDTH;
+        if (timer > 1) {
+            pixelNumber.draw(g2d, timer - 1,(d - 32) / 2, (d + 32) / 2);
+            return;
+        }
+        g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\Ready.png"),(d - 128) / 2,(d + 32) / 2,null);
+    }
+
+    public void drawDead(Graphics2D g2d) throws IOException {
+        int d = Constants.CELL_SIZE * Constants.MAP_WIDTH;
+        if (switchColor) {
+            g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\lose01.png"), (d - 128) / 2, (d + 32) / 2, null);
+            return;
+        }
+        g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\lose02.png"), (d - 128) / 2, (d + 32) / 2, null);
+    }
 }

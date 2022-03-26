@@ -19,6 +19,7 @@ public interface Constants {
     public static final int GHOST_ESCAPE_SPEED = 4;
     public static final int GHOST_ANIMATION_SPEED = 10;
     public static final int GHOST_ANIMATION_FRAMES = 2;
+    public static final int IMPACT_RANGE = 2; // cang cao thi va cham cang gan
 
     public static final int GHOST_PINK_CHASE = 4;
     public static final int GHOST_BLUE_CHASE = 2;
@@ -30,6 +31,10 @@ public interface Constants {
     public static final int CHASE_DURATION = 20; //second
     public static final int LONG_SCATTER_DURATION = 7;
     public static final int SHORT_SCATTER_DURATION = 5;
+
+    public static final int PACMAN_START_LIVES = 3;
+    public static final int READY_TIME = 4;
+
 
     enum Cell {
         Door,

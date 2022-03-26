@@ -36,14 +36,37 @@ public class GameController implements Runnable{
         int drawCount = 0;
 
         long energizerTimer = 0;
+        long blinkTimer = 0;
+
+        int gameTimer = 0;
+
+        // ready trong 3 s
+        long readyTimer = 0;
+        long timer = 0;
+        while (true) {
+            currentTime = System.nanoTime();
+            readyTimer += (currentTime - lastTime);
+            timer += (currentTime - lastTime);
+            lastTime = currentTime;
+            if (timer >= 1000000000) {
+                view.decreaseTimer();
+                view.update(pacman, ghostManager, map);
+                timer = 0;
+            }
+            if (readyTimer >= 1000000000L * Constants.READY_TIME) {
+                view.setReady(true);
+                break;
+            }
+        }
 
         while (!isWin) {
             // draw 60fps
             currentTime = System.nanoTime();
             delta += (currentTime - lastTime) / drawInterval;
 
-            fpsTimer += currentTime - lastTime;
+            fpsTimer += currentTime - lastTime; // thoi gian reset khac nhau, khong the gan
             energizerTimer += currentTime - lastTime;
+            blinkTimer += currentTime - lastTime;
             lastTime = currentTime;
 
             if (delta >= 1) {
@@ -66,7 +89,7 @@ public class GameController implements Runnable{
                 }
 
                 // 4. update ghost
-                ghostManager.update(map, pacman);
+                ghostManager.update(map, pacman, gameTimer);
                 // 5.
 
                 // 6. update view
@@ -76,10 +99,20 @@ public class GameController implements Runnable{
                 if(ghostManager.isKillPacman()) {
                     pacman.reset(false);
                     ghostManager.reset(false);
+                    gameTimer = 0; // FIXME Out of range
+                    pacman.decreaseLive();
+                    System.out.println("live: " + pacman.getLive());
+
                 }
 
                 // 8. Check win
                 isWin = isWin();
+
+                if (pacman.getLive() == 0) {
+                    isWin = true;
+                    view.setLose(true);
+                    // draw death
+                }
 
                 // reset delta
                 delta--;
@@ -87,7 +120,16 @@ public class GameController implements Runnable{
                 drawCount++;
             }
 
-            if (energizerTimer >= 300000000) {
+            // ghost nhap nhay
+            if (blinkTimer >= 100000000) {
+                if (pacman.getEnergizerTimer() <= 3 && pacman.getEnergizerTimer() > 0) {
+                    ghostManager.makeBlinkEffect();
+                }
+                blinkTimer = 0;
+            }
+
+            // energizer nhap nhay
+            if (energizerTimer >= 200000000) {
                 map.energizerSwitch();
                 energizerTimer = 0;
             }
@@ -100,19 +142,33 @@ public class GameController implements Runnable{
                 }
                 //System.out.println("FPS:" + drawCount);
                 ghostManager.phaseUpdate();
+                gameTimer += 1;
                 drawCount = 0;
                 fpsTimer = 0;
             }
         }
+
+        while (isWin) {
+            currentTime = System.nanoTime();
+            energizerTimer += currentTime - lastTime;
+            lastTime = currentTime;
+            if (energizerTimer >= 200000000) {
+                view.switchColor();
+                view.update(pacman, ghostManager, map);
+                energizerTimer = 0;
+            }
+        }
     }
 
+    ///////////////
+    // Controller methods
+    ///////////////
     public GameController(GameView view) throws IOException {
         data = new FileUtils();
         pacman = new Pacman();
         ghostManager = new GhostManager();
         map = new Map();
         this.view = view;
-
         initGame();
     }
 
