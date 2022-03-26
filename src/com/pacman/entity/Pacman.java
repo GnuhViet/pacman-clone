@@ -37,7 +37,7 @@ public class Pacman {
     public void reset(boolean isNewGame) {
         if (isNewGame) {
             startX = (position.x * Constants.CELL_SIZE);
-            startY = (position.y * Constants.CELL_SIZE);
+            startY = (position.y * Constants.CELL_SIZE) + Constants.SCREEN_TOP_MARGIN;
             live = Constants.PACMAN_START_LIVES;
         }
 

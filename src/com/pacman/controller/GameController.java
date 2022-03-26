@@ -69,6 +69,7 @@ public class GameController implements Runnable{
             blinkTimer += currentTime - lastTime;
             lastTime = currentTime;
 
+
             if (delta >= 1) {
                 // delta >= 1 mean past 0.0166 sec
                 // 1. update pacman position
@@ -76,7 +77,7 @@ public class GameController implements Runnable{
 
                 // get pacman position in map
                 int x = (int) Math.round(pacman.getPosition().x / (double) (Constants.CELL_SIZE));
-                int y = (int) Math.round(pacman.getPosition().y / (double) (Constants.CELL_SIZE));
+                int y = (int) Math.round(pacman.getPosition().y / (double) (Constants.CELL_SIZE)) - Constants.SCREEN_TOP_MARGIN / Constants.CELL_SIZE;
 
                 // kiem tra xem co o trong map khong...
                 if (0 < x && Constants.MAP_HEIGHT > y && Constants.MAP_WIDTH > x) {
@@ -85,7 +86,7 @@ public class GameController implements Runnable{
                     // neu pacman an energizer thi ghost bi frightened
                     ghostManager.updateFrightened(pacman);
                     // 3. update map
-                    mapUpdate(x, y);
+                    map.mapUpdate(x, y);
                 }
 
                 // 4. update ghost
@@ -188,14 +189,6 @@ public class GameController implements Runnable{
 
     public boolean isWin() {
         return map.isClear();
-    }
-
-    public void mapUpdate(int x, int y) {
-        if (Constants.Cell.Energizer == map.getMapItem(y, x)) {
-            map.setMapItem(x, y, Constants.Cell.Empty);
-            return;
-        }
-        map.setMapItem(x, y, Constants.Cell.Empty);
     }
 
     public void startGameThread() {

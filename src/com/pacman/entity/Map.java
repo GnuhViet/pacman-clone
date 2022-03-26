@@ -20,10 +20,6 @@ public class Map {
         this.map = map;
     }
 
-    public void setMapItem(int x, int y, Constants.Cell element) {
-        map[y][x] = element;
-    }
-
     public Constants.Cell getMapItem(int x, int y) {
         return map[y][x];
     }
@@ -46,7 +42,7 @@ public class Map {
         boolean output = false;
 
         double cellX = iX / (double)(Constants.CELL_SIZE);
-        double cellY = iY / (double)(Constants.CELL_SIZE);
+        double cellY = iY / (double)(Constants.CELL_SIZE) - Constants.SCREEN_TOP_MARGIN /(double) Constants.CELL_SIZE;
 
         for (int i = 0; i < 4; i++) {
             int x = 0;
@@ -98,7 +94,7 @@ public class Map {
             for (int b = 0; b < Constants.MAP_HEIGHT; b++) {
 
                 int xPos = ((b * Constants.CELL_SIZE));
-                int yPos = ((a * Constants.CELL_SIZE));
+                int yPos = ((a * Constants.CELL_SIZE)) + Constants.SCREEN_TOP_MARGIN;
 
                 switch (map[a][b]) {
                     case Door: {
@@ -155,6 +151,17 @@ public class Map {
                     }
                 }
             }
+        }
+    }
+
+
+    public void mapUpdate(int x, int y) {
+        if (Constants.Cell.Energizer == map[y][x]) {
+            map[y][x] =  Constants.Cell.Empty;
+            return;
+        }
+        if (Constants.Cell.Pellet == map[y][x]) {
+            map[y][x] =  Constants.Cell.Empty;
         }
     }
 }

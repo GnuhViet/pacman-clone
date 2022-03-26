@@ -52,7 +52,7 @@ public class GhostManager {
         for (int i = 0; i < NUMBER_OF_GHOSTS; i++) {
             if (isNewGame) {
                 startX[i] = (ghosts[i].getPosition().x * Constants.CELL_SIZE);
-                startY[i] = (ghosts[i].getPosition().y * Constants.CELL_SIZE);
+                startY[i] = (ghosts[i].getPosition().y * Constants.CELL_SIZE) + Constants.SCREEN_TOP_MARGIN;
             }
             ghosts[i].setPosition(startX[i], startY[i]);
         }

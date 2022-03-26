@@ -25,6 +25,9 @@ public class GameView extends JPanel implements KeyListener {
     private boolean isLose;
     private boolean switchColor;
 
+    private static final int dX = Constants.CELL_SIZE * Constants.MAP_WIDTH;
+    private static final int dY = Constants.CELL_SIZE * Constants.MAP_HEIGHT + Constants.SCREEN_TOP_MARGIN * 2;
+
     ///////
     // JPanel methods override
     ///////
@@ -111,23 +114,19 @@ public class GameView extends JPanel implements KeyListener {
         switchColor = !switchColor;
     }
 
-
-
     private void drawReady(Graphics2D g2d) throws IOException {
-        int d = Constants.CELL_SIZE * Constants.MAP_WIDTH;
         if (timer > 1) {
-            pixelNumber.draw(g2d, timer - 1,(d - 32) / 2, (d + 32) / 2);
+            pixelNumber.draw(g2d, timer - 1,(dX - 32) / 2, (dY + 32) / 2);
             return;
         }
-        g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\Ready.png"),(d - 128) / 2,(d + 32) / 2,null);
+        g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\Ready.png"),(dX - 128) / 2,(dY + 32) / 2,null);
     }
 
     public void drawDead(Graphics2D g2d) throws IOException {
-        int d = Constants.CELL_SIZE * Constants.MAP_WIDTH;
         if (switchColor) {
-            g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\lose01.png"), (d - 128) / 2, (d + 32) / 2, null);
+            g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\lose01.png"), (dX - 128) / 2, (dY + 32) / 2, null);
             return;
         }
-        g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\lose02.png"), (d - 128) / 2, (d + 32) / 2, null);
+        g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\lose02.png"), (dX - 128) / 2, (dY + 32) / 2, null);
     }
 }
