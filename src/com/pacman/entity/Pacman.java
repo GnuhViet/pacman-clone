@@ -24,6 +24,8 @@ public class Pacman {
     SpriteSheet pacmanSprite;
     SpriteSheet pacmanDeadSprite;
 
+    private int score;
+
     /////////////
     /// Methods
     ////////////
@@ -39,6 +41,7 @@ public class Pacman {
             startX = (position.x * Constants.CELL_SIZE);
             startY = (position.y * Constants.CELL_SIZE) + Constants.SCREEN_TOP_MARGIN;
             live = Constants.PACMAN_START_LIVES;
+            score = 0;
         }
 
         if (live == 0) {
@@ -77,6 +80,10 @@ public class Pacman {
 
     public int getEnergizerTimer() {
         return energizerTimer;
+    }
+
+    public int getScore() {
+        return score;
     }
 
     public void decreaseLive() {
@@ -139,10 +146,19 @@ public class Pacman {
         }
     }
 
-    public void updateEnergizer(Constants.Cell mapItem) {
+    public void updateCollectItem(Constants.Cell mapItem) {
         if (Constants.Cell.Energizer == mapItem) {
             energizerTimer = Constants.ENERGIZER_DURATION / Constants.FPS;
+            score += Constants.ENERGIZER_SCORE;
         }
+
+        if (Constants.Cell.Pellet == mapItem) {
+            score += Constants.PELLET_SCORE;
+        }
+    }
+
+    public void impactGhostWhenEnergizer() {
+        score += Constants.GHOST_SCORE;
     }
 
     public void reduceEnergizerTimer() {

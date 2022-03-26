@@ -27,19 +27,36 @@ public class PixelNumber {
         return list.toArray();
     }
 
-    public void draw(Graphics2D g2d, int value, int x, int y) {
+    public void draw(Graphics2D g2d, int value, int x, int y, int size) {
+        int space;
         if (value < 0) {
             return;
         }
-        if (value < 10) {
-            g2d.drawImage(numberSheet.grabImage(0, value), x, y, null);
-            return;
+        if (size == 32) {
+            space = Constants.CELL_SIZE;
+            if (value < 10) {
+                g2d.drawImage(numberSheet.grabImage(1, value), x, y, null);
+                return;
+            }
+            Object[] number = toArray(value);
+            int n = number.length;
+            for (Object o : number) {
+                g2d.drawImage(numberSheet.grabImage(1, (int) o), x, y, null);
+                x += space;
+            }
         }
-        Object[] number = toArray(value);
-        int n = number.length;
-        for (Object o : number) {
-            g2d.drawImage(numberSheet.grabImage(0, (int) o), x, y, null);
-            x += Constants.CELL_SIZE;
+        if (size == 16) {
+            space = Constants.CELL_SIZE / 2;
+            if (value < 10) {
+                g2d.drawImage(numberSheet.grabImage(0, value), x, y, null);
+                return;
+            }
+            Object[] number = toArray(value);
+            int n = number.length;
+            for (Object o : number) {
+                g2d.drawImage(numberSheet.grabImage(0, (int) o), x, y, null);
+                x += space;
+            }
         }
     }
 }

@@ -16,6 +16,7 @@ public class GameController implements Runnable{
     private GameView view;
 
     boolean isWin;
+    boolean isLose;
 
     Thread gameThread;
 
@@ -30,20 +31,19 @@ public class GameController implements Runnable{
         double delta = 0;
         long lastTime = System.nanoTime();
         long currentTime;
-
         // count fps
         long fpsTimer = 0;
         int drawCount = 0;
-
-        long energizerTimer = 0;
-        long blinkTimer = 0;
-
+        // hieu ung nhap nhay
+        long energizerTimer = 0; // energizer nhap nhay
+        long blinkTimer = 0; // ghost nhap nhay khi gan het thoi gian frightened
+        // thoi gian game, theo sec
         int gameTimer = 0;
 
-        // ready trong 3 s
-        long readyTimer = 0;
-        long timer = 0;
-        while (true) {
+        long readyTimer = 0; // dem ready time
+        long timer = 0; // dem nguoc..
+
+        while (view.getReadyTimer() > 0) {
             currentTime = System.nanoTime();
             readyTimer += (currentTime - lastTime);
             timer += (currentTime - lastTime);
@@ -69,9 +69,8 @@ public class GameController implements Runnable{
             blinkTimer += currentTime - lastTime;
             lastTime = currentTime;
 
-
+            // delta >= 1 mean past 0.0166 sec
             if (delta >= 1) {
-                // delta >= 1 mean past 0.0166 sec
                 // 1. update pacman position
                 pacman.update(view.getKey(), map);
 
@@ -82,7 +81,7 @@ public class GameController implements Runnable{
                 // kiem tra xem co o trong map khong...
                 if (0 < x && Constants.MAP_HEIGHT > y && Constants.MAP_WIDTH > x) {
                     // 2. check eat energizer
-                    pacman.updateEnergizer(map.getMapItem(x, y));
+                    pacman.updateCollectItem(map.getMapItem(x, y));
                     // neu pacman an energizer thi ghost bi frightened
                     ghostManager.updateFrightened(pacman);
                     // 3. update map
@@ -91,27 +90,29 @@ public class GameController implements Runnable{
 
                 // 4. update ghost
                 ghostManager.update(map, pacman, gameTimer);
-                // 5.
 
-                // 6. update view
+                // 5. update view
                 view.update(pacman, ghostManager, map);
 
-                // 7. check kill pacman
+                // 6. check kill pacman
                 if(ghostManager.isKillPacman()) {
                     pacman.reset(false);
                     ghostManager.reset(false);
+
+                    view.resetReadyTimer(); // 2 second
+
                     gameTimer = 0; // FIXME Out of range
                     pacman.decreaseLive();
-                    System.out.println("live: " + pacman.getLive());
-
                 }
 
-                // 8. Check win
+                // 7. Check win
                 isWin = isWin();
 
+                // 8. Check lose
                 if (pacman.getLive() == 0) {
-                    isWin = true;
+                    view.setReady(true);
                     view.setLose(true);
+                    break; // out vong lap
                     // draw death
                 }
 
@@ -119,6 +120,24 @@ public class GameController implements Runnable{
                 delta--;
                 // count frame
                 drawCount++;
+            }
+
+            // bat dau dem nguoc lai neu chet
+            readyTimer = 0;
+            while (view.getReadyTimer() > 0) {
+                currentTime = System.nanoTime();
+                readyTimer += (currentTime - lastTime);
+                timer += (currentTime - lastTime);
+                lastTime = currentTime;
+                if (timer >= 1000000000) {
+                    view.decreaseTimer();
+                    view.update(pacman, ghostManager, map);
+                    timer = 0;
+                }
+                if (readyTimer >= 1000000000L * Constants.READY_TIME) {
+                    view.setReady(true);
+                    break;
+                }
             }
 
             // ghost nhap nhay
@@ -146,17 +165,6 @@ public class GameController implements Runnable{
                 gameTimer += 1;
                 drawCount = 0;
                 fpsTimer = 0;
-            }
-        }
-
-        while (isWin) {
-            currentTime = System.nanoTime();
-            energizerTimer += currentTime - lastTime;
-            lastTime = currentTime;
-            if (energizerTimer >= 200000000) {
-                view.switchColor();
-                view.update(pacman, ghostManager, map);
-                energizerTimer = 0;
             }
         }
     }
@@ -187,13 +195,14 @@ public class GameController implements Runnable{
         ghostManager.reset(true);
     }
 
-    public boolean isWin() {
-        return map.isClear();
-    }
-
     public void startGameThread() {
         gameThread = new Thread(this);
-        gameThread.start();
         isWin = false;
+        isLose = false;
+        gameThread.start();
+    }
+
+    public boolean isWin() {
+        return map.isClear();
     }
 }
