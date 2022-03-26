@@ -11,24 +11,28 @@ import java.util.concurrent.ThreadLocalRandom;
 public class Ghost {
     private final GhostManager.GhostType type;
     private int direction;
-    private boolean iUseDoor;
-    private boolean isScatter;
-    private boolean touchPacman;
     private Point position;
     private Point target;
     private final Point home;
     private final Point homeExit;
 
+    private boolean iUseDoor;
+    private boolean isScatter;
+    private boolean touchPacman;
+
+    private boolean blueColorFrightened;
     // 0 la khong bi
     // 1 la bi
     // 2 la bi an
     private int frightenedMode;
-
-    //
+    //timer....
     private int animationTimer;
-
-    //
+    //......
     SpriteSheet ghostSprite;
+
+    /////////////
+    /// Methods
+    ////////////
 
     public Ghost(GhostManager.GhostType type) throws IOException {
         this.type = type;
@@ -39,35 +43,69 @@ public class Ghost {
         ghostSprite = new SpriteSheet(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\Entity\\Ghost32.png"));
     }
 
-    public void draw(int i, Graphics2D g2d) {
-        int frame = (int) Math.floor(animationTimer / Constants.GHOST_ANIMATION_SPEED);
-        animationTimer = (animationTimer + 1) % (Constants.GHOST_ANIMATION_SPEED * Constants.GHOST_ANIMATION_FRAMES);
+    public void reset(Point home, Point homeExit) {
+        isScatter = true;
+        iUseDoor = type != GhostManager.GhostType.RED; // red khong the di vao cua'
+        touchPacman = false;
+        animationTimer = 0;
+        frightenedMode = 0;
+        direction = 0;
+        blueColorFrightened = true;
+        this.home.setLocation(home);
+        this.homeExit.setLocation(homeExit);
+        target.setLocation(this.homeExit);
+    }
 
-        if (frightenedMode == 0) {
-            g2d.drawImage(ghostSprite.grabImage(i, frame), position.x, position.y, null);      //body
-            g2d.drawImage(ghostSprite.grabImage(6, direction), position.x, position.y, null); // eyes
-            return;
-        }
-        if (frightenedMode == 1) {
-            g2d.drawImage(ghostSprite.grabImage(4, frame), position.x, position.y, null);  //body
-            g2d.drawImage(ghostSprite.grabImage(6, 4), position.x, position.y, null); // eyes
-            return;
-        }
-        // go home.........
-        g2d.drawImage(ghostSprite.grabImage(7, direction), position.x, position.y, null); // eyes
+    public Point getPosition() {
+        return position;
     }
 
     public void setPosition(int x, int y) {
         position.setLocation(x, y);
     }
 
-    public Point getPosition() {
-        return position;
+    public double getTargetDistance(int direction) {
+        int x = position.x;
+        int y = position.y;
+
+        // tinh khoang cach tu huong dua vao( diem tiep theo ) den muc tieu
+        switch (direction) {
+            case 0: {
+                x += Constants.GHOST_SPEED;
+                break;
+            }
+            case 1: {
+                y -= Constants.GHOST_SPEED;
+                break;
+            }
+            case 2: {
+                x -= Constants.GHOST_SPEED;
+                break;
+            }
+            case 3: {
+                y += Constants.GHOST_SPEED;
+            }
+        }
+        //... pythagoras
+        return Math.sqrt(Math.pow(x - target.x, 2) + Math.pow(y - target.y, 2));
     }
+
+    public int getFrightenedMode() {
+        return frightenedMode;
+    }
+
+    public void blinkSwitch() {
+        blueColorFrightened = !blueColorFrightened;
+    }
+
+    public void switchMode() {
+        isScatter = !isScatter;
+    }
+
     // TODO cham gan hon
     public boolean pacmanCollision(Point pacmanPosition) {
-        if (position.x > pacmanPosition.x - Constants.CELL_SIZE && position.x < pacmanPosition.x + Constants.CELL_SIZE) {
-            if (position.y > pacmanPosition.y - Constants.CELL_SIZE && position.y < pacmanPosition.y + Constants.CELL_SIZE) {
+        if (position.x > pacmanPosition.x - Constants.CELL_SIZE / Constants.IMPACT_RANGE && position.x < pacmanPosition.x + Constants.CELL_SIZE / Constants.IMPACT_RANGE) {
+            if (position.y > pacmanPosition.y - Constants.CELL_SIZE / Constants.IMPACT_RANGE && position.y < pacmanPosition.y + Constants.CELL_SIZE / Constants.IMPACT_RANGE) {
                 return true;
             }
         }
@@ -81,6 +119,11 @@ public class Ghost {
         } else if (0 == pacman.getEnergizerTimer() && frightenedMode == 1) {
             fixGrid();
             frightenedMode = 0;
+            blueColorFrightened = true; // luon luon la mau xanh truoc
+        }
+
+        if (frightenedMode == 2) {
+            blueColorFrightened = true;
         }
     }
 
@@ -98,6 +141,98 @@ public class Ghost {
                     break;
                 case 3: //DOWN
                     position.y += 1;
+            }
+        }
+    }
+
+    public void updateTarget(Point pacmanPos, int pacmanDirection, Point redGhostPosition) {
+        if (iUseDoor) {
+            if (position.equals(target)) {
+                if (homeExit.equals(target)) {// da di den exit
+                    iUseDoor = false; // khong ve duoc nha nua..
+                }
+                else if (home.equals(target)) {
+                    frightenedMode = 0;
+                    target.setLocation(homeExit);
+                }
+            }
+        }
+
+        if (!iUseDoor) { // khong dung else neu khong se co xu huong di sang ben phai vi khong update target kip..
+            if (isScatter) {
+                switch (type) {
+                    case RED: {
+                        target.x = Constants.CELL_SIZE * (Constants.MAP_WIDTH - 1);
+                        target.y = 0;
+                        break;
+                    }
+                    case PINK: {
+                        target.x = 0;
+                        target.y = 0;
+                        break;
+                    }
+                    case BLUE: {
+                        target.x = Constants.CELL_SIZE * (Constants.MAP_WIDTH - 1);
+                        target.y = Constants.CELL_SIZE * (Constants.MAP_HEIGHT - 1);
+                        break;
+                    }
+                    case ORANGE: {
+                        target.x = 0;
+                        target.y = Constants.CELL_SIZE * (Constants.MAP_HEIGHT - 1);
+                    }
+                }
+            } else {    // chase mode....
+                switch (type) {
+                    case RED: {// ghost Red duoi pacman
+                        target.setLocation(pacmanPos);
+                        break;
+                    }
+                    case PINK: {// ghost Pink duoi o thu 4 truoc mat pacman
+                        target.setLocation(pacmanPos);
+                        switch (pacmanDirection) {
+                            case 0:
+                                target.x += Constants.CELL_SIZE * Constants.GHOST_PINK_CHASE;
+                                break;
+                            case 1:
+                                target.y -= Constants.CELL_SIZE * Constants.GHOST_PINK_CHASE;
+                                break;
+                            case 2:
+                                target.x -= Constants.CELL_SIZE * Constants.GHOST_PINK_CHASE;
+                                break;
+                            case 3:
+                                target.y += Constants.CELL_SIZE * Constants.GHOST_PINK_CHASE;
+                        }
+                        break;
+                    }
+                    case BLUE: {
+                        target.setLocation(pacmanPos);
+                        switch (pacmanDirection) { // lay 2 cell truoc mat pacman
+                            case 0:
+                                target.x += Constants.CELL_SIZE * Constants.GHOST_BLUE_CHASE;
+                                break;
+                            case 1:
+                                target.y -= Constants.CELL_SIZE * Constants.GHOST_BLUE_CHASE;
+                                break;
+                            case 2:
+                                target.x -= Constants.CELL_SIZE * Constants.GHOST_BLUE_CHASE;
+                                break;
+                            case 3:
+                                target.y += Constants.CELL_SIZE * Constants.GHOST_BLUE_CHASE;
+                        }
+
+                        target.x += target.x - redGhostPosition.x;
+                        target.y += target.y - redGhostPosition.y;
+                        break;
+                    }
+                    case ORANGE: {
+                        int ghost3chase = Constants.CELL_SIZE * Constants.GHOST_ORANGE_CHASE;
+                        if (ghost3chase <= Math.sqrt(Math.pow(position.x - pacmanPos.x, 2) + Math.pow(position.y - pacmanPos.y, 2))) {
+                            target.setLocation(pacmanPos);
+                        } else {
+                            target.setLocation(0, Constants.CELL_SIZE * (Constants.MAP_HEIGHT - 1));
+                        }
+                    }
+                }
             }
         }
     }
@@ -214,136 +349,28 @@ public class Ghost {
         return touchPacman;
     }
 
-    public void updateTarget(Point pacmanPos, int pacmanDirection, Point redGhostPosition) {
-        if (iUseDoor) {
-            if (position.equals(target)) {
-                if (homeExit.equals(target)) {// da di den exit
-                    iUseDoor = false; // khong ve duoc nha nua..
-                }
-                else if (home.equals(target)) {
-                    frightenedMode = 0;
-                    target.setLocation(homeExit);
-                }
-            }
+    public void draw(int i, Graphics2D g2d) {
+        int frame = (int) Math.floor(animationTimer / Constants.GHOST_ANIMATION_SPEED);
+        animationTimer = (animationTimer + 1) % (Constants.GHOST_ANIMATION_SPEED * Constants.GHOST_ANIMATION_FRAMES);
+
+        if (frightenedMode == 0) {
+            g2d.drawImage(ghostSprite.grabImage(i, frame), position.x, position.y, null);      //body
+            g2d.drawImage(ghostSprite.grabImage(6, direction), position.x, position.y, null); // eyes
+            return;
         }
 
-        if (!iUseDoor) { // khong dung else neu khong se co xu huong di sang ben phai vi khong update target kip..
-            if (isScatter) {
-                switch (type) {
-                    case RED: {
-                        target.x = Constants.CELL_SIZE * (Constants.MAP_WIDTH - 1);
-                        target.y = 0;
-                        break;
-                    }
-                    case PINK: {
-                        target.x = 0;
-                        target.y = 0;
-                        break;
-                    }
-                    case BLUE: {
-                        target.x = Constants.CELL_SIZE * (Constants.MAP_WIDTH - 1);
-                        target.y = Constants.CELL_SIZE * (Constants.MAP_HEIGHT - 1);
-                        break;
-                    }
-                    case ORANGE: {
-                        target.x = 0;
-                        target.y = Constants.CELL_SIZE * (Constants.MAP_HEIGHT - 1);
-                    }
-                }
-            } else {    // chase mode....
-                switch (type) {
-                    case RED: {// ghost Red duoi pacman
-                        target.setLocation(pacmanPos);
-                        break;
-                    }
-                    case PINK: {// ghost Pink duoi o thu 4 truoc mat pacman
-                        target.setLocation(pacmanPos);
-                        switch (pacmanDirection) {
-                            case 0:
-                                target.x += Constants.CELL_SIZE * Constants.GHOST_PINK_CHASE;
-                                break;
-                            case 1:
-                                target.y -= Constants.CELL_SIZE * Constants.GHOST_PINK_CHASE;
-                                break;
-                            case 2:
-                                target.x -= Constants.CELL_SIZE * Constants.GHOST_PINK_CHASE;
-                                break;
-                            case 3:
-                                target.y += Constants.CELL_SIZE * Constants.GHOST_PINK_CHASE;
-                        }
-                        break;
-                    }
-                    case BLUE: {
-                        target.setLocation(pacmanPos);
-                        switch (pacmanDirection) { // lay 2 cell truoc mat pacman
-                            case 0:
-                                target.x += Constants.CELL_SIZE * Constants.GHOST_BLUE_CHASE;
-                                break;
-                            case 1:
-                                target.y -= Constants.CELL_SIZE * Constants.GHOST_BLUE_CHASE;
-                                break;
-                            case 2:
-                                target.x -= Constants.CELL_SIZE * Constants.GHOST_BLUE_CHASE;
-                                break;
-                            case 3:
-                                target.y += Constants.CELL_SIZE * Constants.GHOST_BLUE_CHASE;
-                        }
-
-                        target.x += target.x - redGhostPosition.x;
-                        target.y += target.y - redGhostPosition.y;
-                        break;
-                    }
-                    case ORANGE: {
-                        int ghost3chase = Constants.CELL_SIZE * Constants.GHOST_ORANGE_CHASE;
-                        if (ghost3chase <= Math.sqrt(Math.pow(position.x - pacmanPos.x, 2) + Math.pow(position.y - pacmanPos.y, 2))) {
-                            target.setLocation(pacmanPos);
-                        } else {
-                            target.setLocation(0, Constants.CELL_SIZE * (Constants.MAP_HEIGHT - 1));
-                        }
-                    }
-                }
+        if (frightenedMode == 1) {
+            if (blueColorFrightened) {
+                g2d.drawImage(ghostSprite.grabImage(4, frame), position.x, position.y, null);  //body
+                g2d.drawImage(ghostSprite.grabImage(6, 4), position.x, position.y, null); // eyes
+            } else {
+                g2d.drawImage(ghostSprite.grabImage(5, frame), position.x, position.y, null);  //body
+                g2d.drawImage(ghostSprite.grabImage(6, 5), position.x, position.y, null); // eyes
             }
+            return;
         }
+        // go home.........
+        g2d.drawImage(ghostSprite.grabImage(7, direction), position.x, position.y, null); // eyes
     }
 
-    public void reset(Point home, Point homeExit) {
-        isScatter = true;
-        iUseDoor = type != GhostManager.GhostType.RED; // red khong the di vao cua'
-        touchPacman = false;
-        animationTimer = 0;
-        frightenedMode = 0;
-        this.home.setLocation(home);
-        this.homeExit.setLocation(homeExit);
-        target.setLocation(this.homeExit);
-    }
-
-    public double getTargetDistance(int direction) {
-        int x = position.x;
-        int y = position.y;
-
-        // tinh khoang cach tu huong dua vao( diem tiep theo ) den muc tieu
-        switch (direction) {
-            case 0: {
-                x += Constants.GHOST_SPEED;
-                break;
-            }
-            case 1: {
-                y -= Constants.GHOST_SPEED;
-                break;
-            }
-            case 2: {
-                x -= Constants.GHOST_SPEED;
-                break;
-            }
-            case 3: {
-                y += Constants.GHOST_SPEED;
-            }
-        }
-        //... pythagoras
-        return Math.sqrt(Math.pow(x - target.x, 2) + Math.pow(y - target.y, 2));
-    }
-
-    public void switchMode() {
-        isScatter = !isScatter;
-    }
 }

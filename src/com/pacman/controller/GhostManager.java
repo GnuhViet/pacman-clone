@@ -30,9 +30,12 @@ public class GhostManager {
     }
 
     private final Ghost[] ghosts;
-    private int[] startX; // vi tri tinh theo diem anh
-    private int[] startY;
+    private final int[] startX; // vi tri tinh theo diem anh
+    private final int[] startY;
 
+    /////////////
+    /// Methods
+    ////////////
 
     public GhostManager() throws IOException {
         startX = new int[NUMBER_OF_GHOSTS];
@@ -64,25 +67,8 @@ public class GhostManager {
         return ghosts[type.ordinal()];
     }
 
-    public void updateFrightened(Pacman pacman) {
-        for (int i = 0; i < NUMBER_OF_GHOSTS; i++) {
-            ghosts[i].updateFrightened(pacman);
-        }
-    }
-
-    public void update(Map map, Pacman pacman) {
-        for (int i = 0; i < NUMBER_OF_GHOSTS; i++) {
-            ghosts[i].update(map, pacman, ghosts[0].getPosition());
-        }
-    }
-
-    public boolean isKillPacman() {
-        for (int i = 0; i < NUMBER_OF_GHOSTS; i++) {
-            if (ghosts[i].touchPacman()) {
-                return true;
-            }
-        }
-        return false;
+    public void setPosition(GhostType type, int x, int y) {
+        ghosts[type.ordinal()].setPosition(x, y);
     }
 
     public void phaseUpdate() {
@@ -133,13 +119,43 @@ public class GhostManager {
 
     }
 
+    public void updateFrightened(Pacman pacman) {
+        for (int i = 0; i < NUMBER_OF_GHOSTS; i++) {
+            ghosts[i].updateFrightened(pacman);
+        }
+    }
+
+    public void update(Map map, Pacman pacman, int gameTimer) {
+        if (gameTimer <= 2) {
+            ghosts[0].update(map, pacman, ghosts[0].getPosition());
+            ghosts[1].update(map, pacman, ghosts[0].getPosition());
+            return;
+        }
+        for (int i = 0; i < NUMBER_OF_GHOSTS; i++) {
+            ghosts[i].update(map, pacman, ghosts[0].getPosition());
+        }
+    }
+
+    public void makeBlinkEffect() {
+        for (int i = 0; i < NUMBER_OF_GHOSTS; i++) {
+            if (ghosts[i].getFrightenedMode() == 1) {
+                ghosts[i].blinkSwitch();
+            }
+        }
+    }
+
+    public boolean isKillPacman() {
+        for (int i = 0; i < NUMBER_OF_GHOSTS; i++) {
+            if (ghosts[i].touchPacman()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void draw(Graphics2D g2d) {
         for (int i = 0; i < 4; i++) {
             ghosts[i].draw(i, g2d);
         }
-    }
-
-    public void setPosition(GhostType type, int x, int y) {
-        ghosts[type.ordinal()].setPosition(x, y);
     }
 }
