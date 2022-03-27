@@ -165,10 +165,18 @@ public class Pacman {
         energizerTimer = Math.max(0, energizerTimer-1);
     }
 
-    public void draw(Graphics2D g2d) {
-        int frame = (int) Math.floor(animationTimer / Constants.PACMAN_ANIMATION_SPEED);
 
-        g2d.drawImage(pacmanSprite.grabImage(direction, frame), position.x, position.y, null);
+    public void updateDeath() {
+        // N.A
+    }
+    public void draw(Graphics2D g2d) {
+
+        int frame = (int) Math.floor(animationTimer / Constants.PACMAN_ANIMATION_SPEED);
+        if (isAlive) {
+            g2d.drawImage(pacmanSprite.grabImage(direction, frame), position.x, position.y, null);
+        } else {
+            g2d.drawImage(pacmanDeadSprite.grabImage(0, frame), position.x, position.y, null);
+        }
 
         animationTimer = (animationTimer + 1) % (Constants.PACMAN_ANIMATION_SPEED * Constants.PACMAN_ANIMATION_FRAMES);
     }

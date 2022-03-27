@@ -15,8 +15,10 @@ public class GameController implements Runnable{
     private Map map;
     private GameView view;
 
-    boolean isWin;
-    boolean isLose;
+    private boolean isWin;
+    private boolean isLose;
+    private boolean isFinish;
+    private int level;
 
     Thread gameThread;
 
@@ -29,7 +31,7 @@ public class GameController implements Runnable{
         // draw 60fps
         double drawInterval = 1000000000/Constants.FPS; // drawn 1 frame in 0.0166sec
         double delta = 0;
-        long lastTime = System.nanoTime();
+        long lastTime = 0;
         long currentTime;
         // count fps
         long fpsTimer = 0;
@@ -40,26 +42,10 @@ public class GameController implements Runnable{
         // thoi gian game, theo sec
         int gameTimer = 0;
 
-        long readyTimer = 0; // dem ready time
-        long timer = 0; // dem nguoc..
+        countDownReady();
+        lastTime = System.nanoTime();
 
-        while (view.getReadyTimer() > 0) {
-            currentTime = System.nanoTime();
-            readyTimer += (currentTime - lastTime);
-            timer += (currentTime - lastTime);
-            lastTime = currentTime;
-            if (timer >= 1000000000) {
-                view.decreaseTimer();
-                view.update(pacman, ghostManager, map);
-                timer = 0;
-            }
-            if (readyTimer >= 1000000000L * Constants.READY_TIME) {
-                view.setReady(true);
-                break;
-            }
-        }
-
-        while (!isWin) {
+        while (!isFinish) {
             // draw 60fps
             currentTime = System.nanoTime();
             delta += (currentTime - lastTime) / drawInterval;
@@ -92,13 +78,12 @@ public class GameController implements Runnable{
                 ghostManager.update(map, pacman, gameTimer);
 
                 // 5. update view
-                view.update(pacman, ghostManager, map);
+                view.update(pacman, ghostManager, map, level);
 
                 // 6. check kill pacman
                 if(ghostManager.isKillPacman()) {
                     pacman.reset(false);
                     ghostManager.reset(false);
-
                     view.resetReadyTimer(); // 2 second
 
                     gameTimer = 0; // FIXME Out of range
@@ -107,9 +92,19 @@ public class GameController implements Runnable{
 
                 // 7. Check win
                 isWin = isWin();
+                if (isWin) {
+                    if (level < 8) {
+                        level += 1;
+                        this.nextLevel();
+                    }
+                    else {
+                        isFinish = true;
+                    }
+                }
 
                 // 8. Check lose
                 if (pacman.getLive() == 0) {
+                    pacman.setAlive(false);
                     view.setReady(true);
                     view.setLose(true);
                     break; // out vong lap
@@ -122,22 +117,9 @@ public class GameController implements Runnable{
                 drawCount++;
             }
 
-            // bat dau dem nguoc lai neu chet
-            readyTimer = 0;
-            while (view.getReadyTimer() > 0) {
-                currentTime = System.nanoTime();
-                readyTimer += (currentTime - lastTime);
-                timer += (currentTime - lastTime);
-                lastTime = currentTime;
-                if (timer >= 1000000000) {
-                    view.decreaseTimer();
-                    view.update(pacman, ghostManager, map);
-                    timer = 0;
-                }
-                if (readyTimer >= 1000000000L * Constants.READY_TIME) {
-                    view.setReady(true);
-                    break;
-                }
+            if (!view.getReady()) {
+                countDownReady();
+                lastTime = System.nanoTime();
             }
 
             // ghost nhap nhay
@@ -167,6 +149,22 @@ public class GameController implements Runnable{
                 fpsTimer = 0;
             }
         }
+
+        // TODO ve death animation roi doi panel
+        lastTime = System.nanoTime();
+        while (true) {
+            // draw 60fps
+            currentTime = System.nanoTime();
+            delta += (currentTime - lastTime) / drawInterval;
+            fpsTimer += currentTime - lastTime; // thoi gian reset khac nhau, khong the gan
+            energizerTimer += currentTime - lastTime;
+            blinkTimer += currentTime - lastTime;
+            lastTime = currentTime;
+            if (delta >= 1) {
+                pacman.updateDeath();
+                delta--;
+            }
+        }
     }
 
     ///////////////
@@ -186,7 +184,7 @@ public class GameController implements Runnable{
         map.setMap(data.getMap(pacman, ghostManager));
 
         // update view
-        view.update(pacman, ghostManager, map);
+        view.update(pacman, ghostManager, map, level);
 
         // move to right pos in map
         pacman.reset(true);
@@ -195,11 +193,50 @@ public class GameController implements Runnable{
         ghostManager.reset(true);
     }
 
+    public void nextLevel() { // TODO... update me, player, khong reset diem,..., ve them man choi
+        // set map
+        map.setMap(data.getMap(pacman, ghostManager));
+
+        // update view
+        view.update(pacman, ghostManager, map, level);
+
+        // move to right pos in map
+        pacman.reset(false);
+
+        // move to right pos in map
+        ghostManager.reset(false);
+    }
+
     public void startGameThread() {
         gameThread = new Thread(this);
         isWin = false;
         isLose = false;
+        isFinish = false;
+        level = 1;
         gameThread.start();
+    }
+
+    public void countDownReady() {
+        long lastTime = System.nanoTime();
+        long currentTime;
+        long readyTimer = 0; // dem ready time
+        long timer = 0; // dem nguoc..
+
+        while (view.getReadyTimer() > 0) {
+            currentTime = System.nanoTime();
+            readyTimer += (currentTime - lastTime);
+            timer += (currentTime - lastTime);
+            lastTime = currentTime;
+            if (timer >= 1000000000) {
+                view.decreaseTimer();
+                view.update(pacman, ghostManager, map, level);
+                timer = 0;
+            }
+            if (readyTimer >= 1000000000L * Constants.READY_TIME) {
+                view.setReady(true);
+                break;
+            }
+        }
     }
 
     public boolean isWin() {
