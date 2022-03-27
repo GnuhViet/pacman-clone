@@ -90,7 +90,7 @@ public class GameTitleUI {
     }
 
 
-    // Image button
+    // Image button // TODO update thanh sprite
     private class MenuButton extends JLabel implements MouseListener {
         private static final String iconFolPath = "src\\com\\pacman\\res\\MenuButton\\";
         String buttonName;

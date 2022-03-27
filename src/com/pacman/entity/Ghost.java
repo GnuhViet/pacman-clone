@@ -119,9 +119,11 @@ public class Ghost {
         } else if (0 == pacman.getEnergizerTimer() && frightenedMode == 1) {
             fixGrid();
             frightenedMode = 0;
-            blueColorFrightened = true; // luon luon la mau xanh truoc
         }
-
+        // luon la mau xanh truoc
+        if (pacman.getEnergizerTimer() > 3 && frightenedMode == 1) {
+            blueColorFrightened = true;
+        }
         if (frightenedMode == 2) {
             blueColorFrightened = true;
         }
@@ -334,9 +336,10 @@ public class Ghost {
         }
 
         if (pacmanCollision(pacmanPos)) {
-            if (0 == frightenedMode) {
+            if (0 == frightenedMode) { // pacman die :(
                 touchPacman = true;
-            } else {
+            } else { // bi pacman an khi engerizer
+                pacman.impactGhostWhenEnergizer(); // score
                 iUseDoor = true;
                 fixGrid();
                 frightenedMode = 2;

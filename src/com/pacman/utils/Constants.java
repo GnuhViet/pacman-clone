@@ -6,12 +6,14 @@ public interface Constants {
     public static final int MAP_WIDTH = 21;
     public static final int FONT_SIZE = 18;
 
+    public static final int SCREEN_TOP_MARGIN = CELL_SIZE;
+    public static final int SCREEN_BOTTOM_MARGIN = CELL_SIZE * 3;
     public static final int SCREEN_WIDTH  = (CELL_SIZE * MAP_WIDTH ) + CELL_SIZE / 2;
-    public static final int SCREEN_HEIGHT = (CELL_SIZE * MAP_HEIGHT) + CELL_SIZE * 3;
+    public static final int SCREEN_HEIGHT = (CELL_SIZE * MAP_HEIGHT) + SCREEN_TOP_MARGIN + SCREEN_BOTTOM_MARGIN;
 
     public static final int PACMAN_ANIMATION_FRAMES = 11;
     public static final int PACMAN_ANIMATION_SPEED = 3;
-    public static final int PACMAN_DEATH_FRAMES = 12;
+    public static final int PACMAN_DEATH_FRAMES = 14;
     public static final int PACMAN_SPEED = 2;
 
     public static final int GHOST_SPEED = 2;
@@ -35,6 +37,9 @@ public interface Constants {
     public static final int PACMAN_START_LIVES = 3;
     public static final int READY_TIME = 4;
 
+    public static final int PELLET_SCORE = 10;
+    public static final int ENERGIZER_SCORE = 50;
+    public static final int GHOST_SCORE = 300;
 
     enum Cell {
         Door,

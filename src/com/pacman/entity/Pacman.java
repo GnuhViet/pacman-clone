@@ -24,6 +24,8 @@ public class Pacman {
     SpriteSheet pacmanSprite;
     SpriteSheet pacmanDeadSprite;
 
+    private int score;
+
     /////////////
     /// Methods
     ////////////
@@ -37,8 +39,9 @@ public class Pacman {
     public void reset(boolean isNewGame) {
         if (isNewGame) {
             startX = (position.x * Constants.CELL_SIZE);
-            startY = (position.y * Constants.CELL_SIZE);
+            startY = (position.y * Constants.CELL_SIZE) + Constants.SCREEN_TOP_MARGIN;
             live = Constants.PACMAN_START_LIVES;
+            score = 0;
         }
 
         if (live == 0) {
@@ -77,6 +80,10 @@ public class Pacman {
 
     public int getEnergizerTimer() {
         return energizerTimer;
+    }
+
+    public int getScore() {
+        return score;
     }
 
     public void decreaseLive() {
@@ -139,20 +146,37 @@ public class Pacman {
         }
     }
 
-    public void updateEnergizer(Constants.Cell mapItem) {
+    public void updateCollectItem(Constants.Cell mapItem) {
         if (Constants.Cell.Energizer == mapItem) {
             energizerTimer = Constants.ENERGIZER_DURATION / Constants.FPS;
+            score += Constants.ENERGIZER_SCORE;
         }
+
+        if (Constants.Cell.Pellet == mapItem) {
+            score += Constants.PELLET_SCORE;
+        }
+    }
+
+    public void impactGhostWhenEnergizer() {
+        score += Constants.GHOST_SCORE;
     }
 
     public void reduceEnergizerTimer() {
         energizerTimer = Math.max(0, energizerTimer-1);
     }
 
-    public void draw(Graphics2D g2d) {
-        int frame = (int) Math.floor(animationTimer / Constants.PACMAN_ANIMATION_SPEED);
 
-        g2d.drawImage(pacmanSprite.grabImage(direction, frame), position.x, position.y, null);
+    public void updateDeath() {
+        // N.A
+    }
+    public void draw(Graphics2D g2d) {
+
+        int frame = (int) Math.floor(animationTimer / Constants.PACMAN_ANIMATION_SPEED);
+        if (isAlive) {
+            g2d.drawImage(pacmanSprite.grabImage(direction, frame), position.x, position.y, null);
+        } else {
+            g2d.drawImage(pacmanDeadSprite.grabImage(0, frame), position.x, position.y, null);
+        }
 
         animationTimer = (animationTimer + 1) % (Constants.PACMAN_ANIMATION_SPEED * Constants.PACMAN_ANIMATION_FRAMES);
     }
