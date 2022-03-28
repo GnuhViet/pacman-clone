@@ -113,7 +113,7 @@ public class Ghost {
     }
 
     public void updateFrightened(Pacman pacman) {
-        if (0 == frightenedMode && pacman.getEnergizerTimer() == Constants.ENERGIZER_DURATION / Constants.FPS) {
+        if (0 == frightenedMode && pacman.getEnergizerTimer() == Constants.ENERGIZER_DURATION) {
             frightenedMode = 1;
             direction = (2 + direction) % 4;
         } else if (0 == pacman.getEnergizerTimer() && frightenedMode == 1) {
@@ -339,7 +339,9 @@ public class Ghost {
             if (0 == frightenedMode) { // pacman die :(
                 touchPacman = true;
             } else { // bi pacman an khi engerizer
-                pacman.impactGhostWhenEnergizer(); // score
+                if (frightenedMode == 1) { // chi cong diem khi che do la 1
+                    pacman.impactGhostWhenEnergizer(); // score
+                }
                 iUseDoor = true;
                 fixGrid();
                 frightenedMode = 2;

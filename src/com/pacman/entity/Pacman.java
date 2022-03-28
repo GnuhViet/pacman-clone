@@ -25,6 +25,7 @@ public class Pacman {
     SpriteSheet pacmanDeadSprite;
 
     private int score;
+    private int bonus;
 
     /////////////
     /// Methods
@@ -42,6 +43,7 @@ public class Pacman {
             startY = (position.y * Constants.CELL_SIZE) + Constants.SCREEN_TOP_MARGIN;
             live = Constants.PACMAN_START_LIVES;
             score = 0;
+            bonus = 0;
         }
 
         if (live == 0) {
@@ -148,8 +150,9 @@ public class Pacman {
 
     public void updateCollectItem(Constants.Cell mapItem) {
         if (Constants.Cell.Energizer == mapItem) {
-            energizerTimer = Constants.ENERGIZER_DURATION / Constants.FPS;
+            energizerTimer = Constants.ENERGIZER_DURATION;
             score += Constants.ENERGIZER_SCORE;
+            bonus = 0;
         }
 
         if (Constants.Cell.Pellet == mapItem) {
@@ -158,17 +161,21 @@ public class Pacman {
     }
 
     public void impactGhostWhenEnergizer() {
-        score += Constants.GHOST_SCORE;
+        bonus += Constants.GHOST_SCORE;
+        score += bonus;
     }
 
     public void reduceEnergizerTimer() {
         energizerTimer = Math.max(0, energizerTimer-1);
+        if(energizerTimer == 0) {
+            bonus = 0; // reset bonus
+        }
     }
 
-
-    public void updateDeath() {
+    public void updateBonus(Point position) {
         // N.A
     }
+
     public void draw(Graphics2D g2d) {
 
         int frame = (int) Math.floor(animationTimer / Constants.PACMAN_ANIMATION_SPEED);

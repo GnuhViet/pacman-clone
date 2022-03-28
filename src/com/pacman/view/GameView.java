@@ -104,6 +104,7 @@ public class GameView extends JPanel implements KeyListener {
     public int getReadyTimer() {
         return readyTimer;
     }
+
     public int getKey() {
         return key;
     }
