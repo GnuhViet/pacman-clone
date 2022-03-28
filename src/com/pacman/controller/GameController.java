@@ -66,7 +66,7 @@ public class GameController implements Runnable{
 
                 // kiem tra xem co o trong map khong...
                 if (0 < x && Constants.MAP_HEIGHT > y && Constants.MAP_WIDTH > x) {
-                    // 2. check eat energizer
+                    // 2. check collectItem
                     pacman.updateCollectItem(map.getMapItem(x, y));
                     // neu pacman an energizer thi ghost bi frightened
                     ghostManager.updateFrightened(pacman);
@@ -117,6 +117,7 @@ public class GameController implements Runnable{
                 drawCount++;
             }
 
+            // neu bi an thi dem nguoc
             if (!view.getReady()) {
                 countDownReady();
                 lastTime = System.nanoTime();
@@ -147,22 +148,6 @@ public class GameController implements Runnable{
                 gameTimer += 1;
                 drawCount = 0;
                 fpsTimer = 0;
-            }
-        }
-
-        // TODO ve death animation roi doi panel
-        lastTime = System.nanoTime();
-        while (true) {
-            // draw 60fps
-            currentTime = System.nanoTime();
-            delta += (currentTime - lastTime) / drawInterval;
-            fpsTimer += currentTime - lastTime; // thoi gian reset khac nhau, khong the gan
-            energizerTimer += currentTime - lastTime;
-            blinkTimer += currentTime - lastTime;
-            lastTime = currentTime;
-            if (delta >= 1) {
-                pacman.updateDeath();
-                delta--;
             }
         }
     }

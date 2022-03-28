@@ -29,10 +29,12 @@ public interface Constants {
 
     public static final int FPS = 60;
 
-    public static final int ENERGIZER_DURATION = 8 * FPS;
+    public static final int ENERGIZER_DURATION = 8;
     public static final int CHASE_DURATION = 20; //second
     public static final int LONG_SCATTER_DURATION = 7;
     public static final int SHORT_SCATTER_DURATION = 5;
+
+    public static final int SCORE_DURATION_FRAMES = 3 * FPS;
 
     public static final int PACMAN_START_LIVES = 3;
     public static final int READY_TIME = 4;
