@@ -32,8 +32,22 @@ public class PixelNumber {
         if (value < 0) {
             return;
         }
-        if (size == 32) {
-            space = Constants.CELL_SIZE;
+        if (size == 10) {
+            space = Constants.CELL_SIZE / 3;
+            if (value < 10) {
+                g2d.drawImage(numberSheet.grabImage(0, value), x, y, null);
+                return;
+            }
+            Object[] number = toArray(value);
+            int n = number.length;
+            for (Object o : number) {
+                g2d.drawImage(numberSheet.grabImage(0, (int) o), x, y, null);
+                x += space;
+            }
+        }
+
+        if (size == 16) {
+            space = Constants.CELL_SIZE / 2;
             if (value < 10) {
                 g2d.drawImage(numberSheet.grabImage(1, value), x, y, null);
                 return;
@@ -45,16 +59,16 @@ public class PixelNumber {
                 x += space;
             }
         }
-        if (size == 16) {
-            space = Constants.CELL_SIZE / 2;
+        if (size == 32) {
+            space = Constants.CELL_SIZE;
             if (value < 10) {
-                g2d.drawImage(numberSheet.grabImage(0, value), x, y, null);
+                g2d.drawImage(numberSheet.grabImage(2, value), x, y, null);
                 return;
             }
             Object[] number = toArray(value);
             int n = number.length;
             for (Object o : number) {
-                g2d.drawImage(numberSheet.grabImage(0, (int) o), x, y, null);
+                g2d.drawImage(numberSheet.grabImage(2, (int) o), x, y, null);
                 x += space;
             }
         }

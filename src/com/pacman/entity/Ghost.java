@@ -340,7 +340,7 @@ public class Ghost {
                 touchPacman = true;
             } else { // bi pacman an khi engerizer
                 if (frightenedMode == 1) { // chi cong diem khi che do la 1
-                    pacman.impactGhostWhenEnergizer(); // score
+                    pacman.impactGhostWhenEnergizer(this.type); // score
                 }
                 iUseDoor = true;
                 fixGrid();

@@ -1,5 +1,6 @@
 package com.pacman.entity;
 
+import com.pacman.controller.GhostManager;
 import com.pacman.utils.BufferedImageLoader;
 import com.pacman.utils.Constants;
 
@@ -26,6 +27,8 @@ public class Pacman {
 
     private int score;
     private int bonus;
+    private boolean isDrawBonus;
+    private GhostManager.GhostType ghostKilled;
 
     /////////////
     /// Methods
@@ -54,6 +57,7 @@ public class Pacman {
         position.setLocation(startX, startY);
         isAlive = true;
         animationTimer = 0;
+        isDrawBonus = false;
     }
 
     public int getLive() {
@@ -160,9 +164,27 @@ public class Pacman {
         }
     }
 
-    public void impactGhostWhenEnergizer() {
+    public void impactGhostWhenEnergizer(GhostManager.GhostType ghostKilled) {
         bonus += Constants.GHOST_SCORE;
         score += bonus;
+        isDrawBonus = true;
+        this.ghostKilled = ghostKilled;
+    }
+
+    public GhostManager.GhostType getGhostKilled() {
+        return ghostKilled;
+    }
+
+    public void setIsDrawBonus(boolean isDrawBonus) {
+        this.isDrawBonus = isDrawBonus;
+    }
+
+    public boolean isDrawBonus() {
+        return isDrawBonus;
+    }
+
+    public int getBonus() {
+        return bonus;
     }
 
     public void reduceEnergizerTimer() {
@@ -172,13 +194,9 @@ public class Pacman {
         }
     }
 
-    public void updateBonus(Point position) {
-        // N.A
-    }
-
     public void draw(Graphics2D g2d) {
 
-        int frame = (int) Math.floor(animationTimer / Constants.PACMAN_ANIMATION_SPEED);
+        int frame = (int) Math.floor(animationTimer /(double) Constants.PACMAN_ANIMATION_SPEED);
         if (isAlive) {
             g2d.drawImage(pacmanSprite.grabImage(direction, frame), position.x, position.y, null);
         } else {

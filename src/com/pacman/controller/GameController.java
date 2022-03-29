@@ -149,6 +149,17 @@ public class GameController implements Runnable{
                 drawCount = 0;
                 fpsTimer = 0;
             }
+
+            if (pacman.isDrawBonus()) {
+                view.update(pacman, ghostManager, map, level);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                pacman.setIsDrawBonus(false);
+                lastTime = System.nanoTime();
+            }
         }
     }
 
