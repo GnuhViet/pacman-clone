@@ -117,16 +117,12 @@ public class Map {
                     }
                     case Wall: {
 
-                        int up = 0;         // b la truc x
-                        int left = 0;       // a la truc y
+                        int up = 0;
+                        int left = 0;
                         int down = 0;
                         int right = 0;
 
-                        if (b < Constants.MAP_WIDTH - 1) {
-                            if (Constants.Cell.Wall == map[a][b + 1]) {
-                                right = 1; // right
-                            }
-                        }
+                        // check xem co tuong, hoac khong, neu co thi phai noi vao voi nhau
 
                         if (a > 0) {
                             if (Constants.Cell.Wall == map[a - 1][b]) {
@@ -134,9 +130,9 @@ public class Map {
                             }
                         }
 
-                        if (a < Constants.MAP_HEIGHT - 1) {
-                            if (Constants.Cell.Wall == map[a + 1][b]) {
-                                down = 1; // dow
+                        if (b < Constants.MAP_WIDTH - 1) {
+                            if (Constants.Cell.Wall == map[a][b + 1]) {
+                                right = 1; // right
                             }
                         }
 
@@ -146,13 +142,45 @@ public class Map {
                             }
                         }
 
-                        /////// sprite pattern
-                        int pos = down + 2 * left + 4 * right + 8 * up;
+                        if (a < Constants.MAP_HEIGHT - 1) {
+                            if (Constants.Cell.Wall == map[a + 1][b]) {
+                                down = 1; // dow
+                            }
+                        }
+
+                        ////////// 2down_left + 2down_right + 4up_left + 8up_right
+                        int pos = (down + 2 * (left + 2 * (right + 2 * up)));
+
                         if (isBlueColor) {
                             g2d.drawImage(mapSprite.grabImage(1, pos), xPos, yPos, null);
                         }
                         else {
                             g2d.drawImage(mapSprite.grabImage(0, pos), xPos, yPos, null);
+                        }
+
+                        // fix tuong
+                        if (a < Constants.MAP_HEIGHT - 1 && b > 0) {
+                            if (Constants.Cell.Wall == map[a + 1][b - 1] && down == 1 && left == 1) { // down left
+                                g2d.drawImage(mapSprite.grabImage(2, 4), xPos, yPos, null);
+                            }
+                        }
+
+                        if (a < Constants.MAP_HEIGHT - 1 && b < Constants.MAP_WIDTH - 1) {
+                            if (Constants.Cell.Wall == map[a + 1][b + 1] && down == 1 && right == 1) { // down right
+                                g2d.drawImage(mapSprite.grabImage(2, 5), xPos, yPos, null);
+                            }
+                        }
+
+                        if (a > 0 && b > 0) {
+                            if (Constants.Cell.Wall == map[a - 1][b - 1] && up == 1 && left == 1) { // up left
+                                g2d.drawImage(mapSprite.grabImage(2, 6), xPos, yPos, null);
+                            }
+                        }
+
+                        if (a > 0 && b < Constants.MAP_WIDTH - 1) {
+                            if (Constants.Cell.Wall == map[a - 1][b + 1] && up == 1 && right == 1) { // up right
+                                g2d.drawImage(mapSprite.grabImage(2, 7), xPos, yPos, null);
+                            }
                         }
                     }
                 }

@@ -65,7 +65,7 @@ public class GameController implements Runnable{
                 int y = (int) Math.round(pacman.getPosition().y / (double) (Constants.CELL_SIZE)) - Constants.SCREEN_TOP_MARGIN / Constants.CELL_SIZE;
 
                 // kiem tra xem co o trong map khong...
-                if (0 < x && Constants.MAP_HEIGHT > y && Constants.MAP_WIDTH > x) {
+                if (0 <= x && Constants.MAP_WIDTH > x && 0 <= y && Constants.MAP_HEIGHT > y) {
                     // 2. check collectItem
                     pacman.updateCollectItem(map.getMapItem(x, y));
                     // neu pacman an energizer thi ghost bi frightened

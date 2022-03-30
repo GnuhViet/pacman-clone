@@ -146,16 +146,14 @@ public class Pacman {
         // portal... (x)
         if (-Constants.CELL_SIZE >= position.x) { // left
             position.x = Constants.CELL_SIZE * Constants.MAP_WIDTH - Constants.PACMAN_SPEED;
-        }
-        else if (Constants.CELL_SIZE * Constants.MAP_WIDTH <= position.x) { // right
-            position.x = - Constants.CELL_SIZE + Constants.PACMAN_SPEED;
+        } else if (Constants.CELL_SIZE * Constants.MAP_WIDTH <= position.x) { // right
+            position.x = -Constants.CELL_SIZE + Constants.PACMAN_SPEED;
         }
 
         if (Constants.SCREEN_TOP_MARGIN >= position.y) { // top
-            position.y = Constants.CELL_SIZE * Constants.MAP_HEIGHT;
-        }
-        else if (Constants.CELL_SIZE * Constants.MAP_HEIGHT <= position.y) { // bottom
-            position.y = Constants.SCREEN_TOP_MARGIN;
+            position.y = Constants.CELL_SIZE * Constants.MAP_HEIGHT - Constants.PACMAN_SPEED;
+        } else if (Constants.CELL_SIZE * Constants.MAP_HEIGHT <= position.y) { // bottom
+            position.y = Constants.SCREEN_TOP_MARGIN + Constants.PACMAN_SPEED;
         }
     }
 
@@ -195,15 +193,15 @@ public class Pacman {
     }
 
     public void reduceEnergizerTimer() {
-        energizerTimer = Math.max(0, energizerTimer-1);
-        if(energizerTimer == 0) {
+        energizerTimer = Math.max(0, energizerTimer - 1);
+        if (energizerTimer == 0) {
             bonus = 0; // reset bonus
         }
     }
 
     public void draw(Graphics2D g2d) {
 
-        int frame = (int) Math.floor(animationTimer /(double) Constants.PACMAN_ANIMATION_SPEED);
+        int frame = (int) Math.floor(animationTimer / (double) Constants.PACMAN_ANIMATION_SPEED);
         if (isAlive) {
             g2d.drawImage(pacmanSprite.grabImage(direction, frame), position.x, position.y, null);
         } else {
