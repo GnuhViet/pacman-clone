@@ -153,8 +153,11 @@ public class GhostManager {
         return false;
     }
 
-    public void draw(Graphics2D g2d) {
+    public void draw(Graphics2D g2d, boolean beingEat, GhostType type) {
         for (int i = 0; i < 4; i++) {
+            if (beingEat && i == type.ordinal()) {
+               continue;
+            }
             ghosts[i].draw(i, g2d);
         }
     }

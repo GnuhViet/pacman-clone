@@ -1,10 +1,7 @@
 package com.pacman.view;
 
 import com.pacman.controller.GhostManager;
-import com.pacman.entity.Map;
-import com.pacman.entity.Pacman;
-import com.pacman.entity.PixelNumber;
-import com.pacman.entity.SpriteSheet;
+import com.pacman.entity.*;
 import com.pacman.utils.BufferedImageLoader;
 import com.pacman.utils.Constants;
 
@@ -42,16 +39,20 @@ public class GameView extends JPanel implements KeyListener {
             this.drawLives(g2d);
             this.drawLevel(g2d);
             map.drawMap(g2d);
-            pacman.draw(g2d);
-            ghostManager.draw(g2d);
+            if (pacman.isDrawBonus()) {
+                this.drawBonus(g2d);
+                ghostManager.draw(g2d, true, pacman.getGhostKilled());
+            }
+            else {
+                pacman.draw(g2d);
+                ghostManager.draw(g2d, false, GhostManager.GhostType.FRIGHTENED);
+            }
             if (!isReady) {
                 this.drawReady(g2d);
             }
         } catch (IOException e) {
-            e.printStackTrace();
         }
-
-        //g2d.dispose();
+        g2d.dispose();
     }
 
     ///////
@@ -131,6 +132,10 @@ public class GameView extends JPanel implements KeyListener {
     private void drawScore(Graphics2D g2d) throws IOException {
         g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\Score32.png"), 0, 0, null);
         pixelNumber.draw(g2d, pacman.getScore(),86, 0, 16);
+    }
+
+    private void drawBonus(Graphics2D g2d) {
+        pixelNumber.draw(g2d, pacman.getBonus(), pacman.getPosition().x - Constants.CELL_SIZE / 4, pacman.getPosition().y, 10);
     }
 
     private void drawLives(Graphics2D g2d) {

@@ -152,8 +152,7 @@ public class Ghost {
             if (position.equals(target)) {
                 if (homeExit.equals(target)) {// da di den exit
                     iUseDoor = false; // khong ve duoc nha nua..
-                }
-                else if (home.equals(target)) {
+                } else if (home.equals(target)) {
                     frightenedMode = 0;
                     target.setLocation(homeExit);
                 }
@@ -271,8 +270,7 @@ public class Ghost {
             for (int a = 0; a < 4; a++) {
                 if (a == (2 + this.direction) % 4) { // ghost khong quay dau
                     continue;
-                }
-                else if (!wall[a]) {
+                } else if (!wall[a]) {
                     if (4 == optimalDirection) {
                         optimalDirection = a;
                     }
@@ -287,8 +285,7 @@ public class Ghost {
 
             if (1 < availableWay) {
                 direction = optimalDirection;
-            }
-            else {
+            } else {
                 if (4 == optimalDirection) { // truong hop o home
                     direction = (2 + direction) % 4;
                 } else {
@@ -329,10 +326,17 @@ public class Ghost {
             case 3: //DOWN
                 position.y += speed;
         }
-        if (-Constants.CELL_SIZE >= position.x) {
+
+        if (-Constants.CELL_SIZE >= position.x) { // left
             position.x = Constants.CELL_SIZE * Constants.MAP_WIDTH - speed;
-        } else if (Constants.CELL_SIZE * Constants.MAP_WIDTH <= position.x) {
-            position.x = speed - Constants.CELL_SIZE;
+        } else if (Constants.CELL_SIZE * Constants.MAP_WIDTH <= position.x) {// right
+            position.x = -Constants.CELL_SIZE + speed;
+        }
+
+        if (Constants.SCREEN_TOP_MARGIN >= position.y) { // top
+            position.y = Constants.CELL_SIZE * Constants.MAP_HEIGHT - speed;
+        } else if (Constants.CELL_SIZE * Constants.MAP_HEIGHT <= position.y) { // bottom
+            position.y = Constants.SCREEN_TOP_MARGIN + speed;
         }
 
         if (pacmanCollision(pacmanPos)) {
@@ -340,7 +344,7 @@ public class Ghost {
                 touchPacman = true;
             } else { // bi pacman an khi engerizer
                 if (frightenedMode == 1) { // chi cong diem khi che do la 1
-                    pacman.impactGhostWhenEnergizer(); // score
+                    pacman.impactGhostWhenEnergizer(this.type); // score
                 }
                 iUseDoor = true;
                 fixGrid();
