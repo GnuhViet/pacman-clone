@@ -329,10 +329,18 @@ public class Ghost {
             case 3: //DOWN
                 position.y += speed;
         }
+
         if (-Constants.CELL_SIZE >= position.x) {
             position.x = Constants.CELL_SIZE * Constants.MAP_WIDTH - speed;
         } else if (Constants.CELL_SIZE * Constants.MAP_WIDTH <= position.x) {
             position.x = speed - Constants.CELL_SIZE;
+        }
+
+        if (Constants.SCREEN_TOP_MARGIN >= position.y) { // top
+            position.y = Constants.CELL_SIZE * Constants.MAP_HEIGHT;
+        }
+        else if (Constants.CELL_SIZE * Constants.MAP_HEIGHT <= position.y) { // bottom
+            position.y = Constants.SCREEN_TOP_MARGIN;
         }
 
         if (pacmanCollision(pacmanPos)) {

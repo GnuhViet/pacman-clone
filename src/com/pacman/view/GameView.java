@@ -51,10 +51,8 @@ public class GameView extends JPanel implements KeyListener {
                 this.drawReady(g2d);
             }
         } catch (IOException e) {
-            e.printStackTrace();
         }
-
-        //g2d.dispose();
+        g2d.dispose();
     }
 
     ///////

@@ -10,10 +10,12 @@ public class Map {
     private Constants.Cell[][] map;
     private boolean isEnergizerOff;
     private SpriteSheet mapSprite;
+    private boolean isBlueColor;
 
     public Map() throws IOException {
         mapSprite = new SpriteSheet(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\Entity\\Map32.png"));
         isEnergizerOff = false;
+        isBlueColor = true;
     }
 
     public void setMap(Constants.Cell[][] map) {
@@ -98,19 +100,19 @@ public class Map {
 
                 switch (map[a][b]) {
                     case Door: {
-                        g2d.drawImage(mapSprite.grabImage(1, 2), xPos, yPos, null);
+                        g2d.drawImage(mapSprite.grabImage(2, 2), xPos, yPos, null);
                         break;
                     }
                     case Energizer: {
                         if (isEnergizerOff) {
-                            g2d.drawImage(mapSprite.grabImage(1, 3), xPos, yPos, null);
+                            g2d.drawImage(mapSprite.grabImage(2, 3), xPos, yPos, null);
                             break;
                         }
-                        g2d.drawImage(mapSprite.grabImage(1, 1), xPos, yPos, null);
+                        g2d.drawImage(mapSprite.grabImage(2, 1), xPos, yPos, null);
                         break;
                     }
                     case Pellet: {
-                        g2d.drawImage(mapSprite.grabImage(1, 0), xPos, yPos, null);
+                        g2d.drawImage(mapSprite.grabImage(2, 0), xPos, yPos, null);
                         break;
                     }
                     case Wall: {
@@ -146,12 +148,24 @@ public class Map {
 
                         /////// sprite pattern
                         int pos = down + 2 * left + 4 * right + 8 * up;
-
-                        g2d.drawImage(mapSprite.grabImage(0, pos), xPos, yPos, null);
+                        if (isBlueColor) {
+                            g2d.drawImage(mapSprite.grabImage(1, pos), xPos, yPos, null);
+                        }
+                        else {
+                            g2d.drawImage(mapSprite.grabImage(0, pos), xPos, yPos, null);
+                        }
                     }
                 }
             }
         }
+    }
+
+    public void switchColor() {
+        isBlueColor = !isBlueColor;
+    }
+
+    public void resetColor() {
+        isBlueColor = true;
     }
 
 

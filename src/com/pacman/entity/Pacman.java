@@ -144,11 +144,18 @@ public class Pacman {
 
 
         // portal... (x)
-        if (position.x <= -Constants.CELL_SIZE) {
+        if (-Constants.CELL_SIZE >= position.x) { // left
             position.x = Constants.CELL_SIZE * Constants.MAP_WIDTH - Constants.PACMAN_SPEED;
         }
-        else if (position.x >= Constants.CELL_SIZE * Constants.MAP_WIDTH) {
-            position.x = Constants.PACMAN_SPEED - Constants.CELL_SIZE;
+        else if (Constants.CELL_SIZE * Constants.MAP_WIDTH <= position.x) { // right
+            position.x = - Constants.CELL_SIZE + Constants.PACMAN_SPEED;
+        }
+
+        if (Constants.SCREEN_TOP_MARGIN >= position.y) { // top
+            position.y = Constants.CELL_SIZE * Constants.MAP_HEIGHT;
+        }
+        else if (Constants.CELL_SIZE * Constants.MAP_HEIGHT <= position.y) { // bottom
+            position.y = Constants.SCREEN_TOP_MARGIN;
         }
     }
 
