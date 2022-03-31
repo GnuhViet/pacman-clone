@@ -25,6 +25,7 @@ public class Map {
     public Constants.Cell getMapItem(int x, int y) {
         return map[y][x];
     }
+
     public boolean isClear() {
         for (int i = 0; i < Constants.MAP_WIDTH; i++) {
             for (int j = 0; j < Constants.MAP_HEIGHT; j++) {
@@ -148,8 +149,37 @@ public class Map {
                             }
                         }
 
-                        ////////// 2down_left + 2down_right + 4up_left + 8up_right
+                        /*
+                        // check 4 goc
+                        int downLeft = 0;
+                        int downRight = 0;
+                        int upLeft = 0;
+                        int upRight = 0;
+
+                        if (0 < a && Constants.MAP_HEIGHT - 1 > a && 0 < b && Constants.MAP_WIDTH - 1 > b) {
+                            if (Constants.Cell.Wall == map[a + 1][b - 1] && down == 1 && left == 1) {  // down left
+                                downLeft = 1;
+                            }
+
+                            if (Constants.Cell.Wall == map[a + 1][b + 1] && down == 1 && right == 1) { // down right
+                                downRight = 1;
+                            }
+
+                            if (Constants.Cell.Wall == map[a - 1][b - 1] && up == 1 && left == 1) { // up left
+                                upLeft = 1;
+                            }
+
+                            if (Constants.Cell.Wall == map[a - 1][b + 1] && up == 1 && right == 1) { // up right
+                                upRight = 1;
+                            }
+                        }
+                        */
+
+                        ////////// down_left + 2down_right + 4up_left + 8up_right
+
+                        //-------------------<         DISTRIBUTIVE PROPERTY!         >-----------------------
                         int pos = (down + 2 * (left + 2 * (right + 2 * up)));
+                        //int posY = (downLeft + 2 * (downRight + 2 * (upLeft + 2 * upRight)));
 
                         if (isBlueColor) {
                             g2d.drawImage(mapSprite.grabImage(1, pos), xPos, yPos, null);
@@ -195,7 +225,6 @@ public class Map {
     public void resetColor() {
         isBlueColor = true;
     }
-
 
     public void mapUpdate(int x, int y) {
         if (Constants.Cell.Energizer == map[y][x]) {

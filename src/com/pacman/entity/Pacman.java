@@ -10,7 +10,7 @@ import java.io.IOException;
 
 public class Pacman {
     private int direction;
-    Point position;
+    private Point position;
 
     private int live;
     private boolean isAlive;
@@ -20,10 +20,11 @@ public class Pacman {
     // timer
     private int animationTimer;
     private int energizerTimer;
+    private boolean animationOver;
 
     // ......
-    SpriteSheet pacmanSprite;
-    SpriteSheet pacmanDeadSprite;
+    private SpriteSheet pacmanSprite;
+    private SpriteSheet pacmanDeadSprite;
 
     private int score;
     private int bonus;
@@ -47,6 +48,7 @@ public class Pacman {
             live = Constants.PACMAN_START_LIVES;
             score = 0;
             bonus = 0;
+            animationOver = false;
         }
 
         if (live == 0) {
@@ -60,6 +62,9 @@ public class Pacman {
         isDrawBonus = false;
     }
 
+    ///////////////
+    /// GETTER & SETTER
+    //////////////
     public int getLive() {
         return live;
     }
@@ -91,6 +96,35 @@ public class Pacman {
     public int getScore() {
         return score;
     }
+
+    public GhostManager.GhostType getGhostKilled() {
+        return ghostKilled;
+    }
+
+    public void setIsDrawBonus(boolean isDrawBonus) {
+        this.isDrawBonus = isDrawBonus;
+    }
+
+    public boolean isDrawBonus() {
+        return isDrawBonus;
+    }
+
+    public int getBonus() {
+        return bonus;
+    }
+
+    public boolean isAnimationOver() {
+        return animationOver;
+    }
+
+    ///////////
+    protected void setDirection(int direction) {
+        this.direction = direction;
+    }
+
+    ///////////////
+    /// UPDATE
+    //////////////
 
     public void decreaseLive() {
         live--;
@@ -176,22 +210,6 @@ public class Pacman {
         this.ghostKilled = ghostKilled;
     }
 
-    public GhostManager.GhostType getGhostKilled() {
-        return ghostKilled;
-    }
-
-    public void setIsDrawBonus(boolean isDrawBonus) {
-        this.isDrawBonus = isDrawBonus;
-    }
-
-    public boolean isDrawBonus() {
-        return isDrawBonus;
-    }
-
-    public int getBonus() {
-        return bonus;
-    }
-
     public void reduceEnergizerTimer() {
         energizerTimer = Math.max(0, energizerTimer - 1);
         if (energizerTimer == 0) {
@@ -204,10 +222,16 @@ public class Pacman {
         int frame = (int) Math.floor(animationTimer / (double) Constants.PACMAN_ANIMATION_SPEED);
         if (isAlive) {
             g2d.drawImage(pacmanSprite.grabImage(direction, frame), position.x, position.y, null);
-        } else {
-            g2d.drawImage(pacmanDeadSprite.grabImage(0, frame), position.x, position.y, null);
+            animationTimer = (animationTimer + 1) % (Constants.PACMAN_ANIMATION_SPEED * Constants.PACMAN_ANIMATION_FRAMES);
         }
-
-        animationTimer = (animationTimer + 1) % (Constants.PACMAN_ANIMATION_SPEED * Constants.PACMAN_ANIMATION_FRAMES);
+        else {
+            if (animationTimer < Constants.PACMAN_DEATH_FRAMES * Constants.PACMAN_ANIMATION_SPEED) {
+                animationTimer++;
+                g2d.drawImage(pacmanDeadSprite.grabImage(0, frame), position.x, position.y, null);
+            }
+            else {
+                animationOver = true;
+            }
+        }
     }
 }
