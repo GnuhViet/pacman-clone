@@ -56,6 +56,10 @@ public class Ghost {
         target.setLocation(this.homeExit);
     }
 
+    /////////
+    //// Getter & setter
+    ////////
+
     public Point getPosition() {
         return position;
     }
@@ -102,7 +106,22 @@ public class Ghost {
         isScatter = !isScatter;
     }
 
-    // TODO cham gan hon
+    /////////
+    //// Protected Setter
+    ////////
+    protected void setDirection(int direction) {
+        this.direction = direction;
+    }
+
+    protected void setFrightenedMode(int mode) {
+        frightenedMode = mode;
+        blueColorFrightened = true;
+    }
+
+
+    /////////
+    /// UPDATE METHODS
+    ////////
     public boolean pacmanCollision(Point pacmanPosition) {
         if (position.x > pacmanPosition.x - Constants.CELL_SIZE / Constants.IMPACT_RANGE && position.x < pacmanPosition.x + Constants.CELL_SIZE / Constants.IMPACT_RANGE) {
             if (position.y > pacmanPosition.y - Constants.CELL_SIZE / Constants.IMPACT_RANGE && position.y < pacmanPosition.y + Constants.CELL_SIZE / Constants.IMPACT_RANGE) {
@@ -129,6 +148,7 @@ public class Ghost {
         }
     }
 
+    // vi la +1 nen phai fix trong truong hop ra ngoai gird
     public void fixGrid() {
         if (position.x % 2 != 0 || position.y % 2 != 0) {
             switch (direction) {

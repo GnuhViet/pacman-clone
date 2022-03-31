@@ -96,6 +96,7 @@ public class GameController implements Runnable{
                     if (level < 8) {
                         level += 1;
                         this.nextLevel();
+                        view.updateLoadingScreen();
                         view.resetReadyTimer(); // 2 second
                         countDownReady(true);
                         lastTime = System.nanoTime();
@@ -142,7 +143,6 @@ public class GameController implements Runnable{
 
             // print fps and update phase
             if (fpsTimer >= 1000000000) {
-                //System.out.println("Timer: " + pacman.getEnergizerTimer());
                 if (pacman.getEnergizerTimer() > 0) {
                     pacman.reduceEnergizerTimer();
                 }
@@ -153,6 +153,7 @@ public class GameController implements Runnable{
                 fpsTimer = 0;
             }
 
+            // an duoc ghost thi draw diem bonus trong 1 sec
             if (pacman.isDrawBonus()) {
                 view.update(pacman, ghostManager, map, level);
                 try {
@@ -163,6 +164,17 @@ public class GameController implements Runnable{
                 pacman.setIsDrawBonus(false);
                 lastTime = System.nanoTime();
             }
+        }
+
+        // draw death animation
+        while (!pacman.isAnimationOver()) {
+            System.out.println("called");
+            try {
+                Thread.sleep(30);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            view.update(pacman, ghostManager, map, level);
         }
     }
 
@@ -194,7 +206,7 @@ public class GameController implements Runnable{
 
 
     //reset lai
-    public void nextLevel() { // TODO... update me, player, khong reset diem,..., ve them man choi
+    public void nextLevel() { // TODO....., ve them man choi
         // set map
         map.setMap(data.getMap(pacman, ghostManager));
 
