@@ -90,29 +90,37 @@ public class GameController implements Runnable{
                     pacman.decreaseLive();
                 }
 
-                // 7. Check win
+                // 7. Check lose
+                if (pacman.getLive() == 0) {
+                    pacman.setAlive(false);
+                    view.setReady(true);
+                    view.setLose(true);
+                    // draw death animation
+                    while (!pacman.isAnimationOver()) {
+                        try {
+                            Thread.sleep(40);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        view.update(pacman, ghostManager, map, level);
+                    }
+
+                    break; // out vong lap
+                }
+
+                // 8. Check win
                 isWin = isWin();
                 if (isWin) {
                     if (level < 8) {
                         level += 1;
-                        this.nextLevel();
                         view.updateLoadingScreen();
                         view.resetReadyTimer(); // 2 second
-                        countDownReady(true);
+                        this.nextLevel();
                         lastTime = System.nanoTime();
                     }
                     else {
                         isFinish = true;
                     }
-                }
-
-                // 8. Check lose
-                if (pacman.getLive() == 0) {
-                    pacman.setAlive(false);
-                    view.setReady(true);
-                    view.setLose(true);
-                    break; // out vong lap
-                    // draw death
                 }
 
                 // reset delta
@@ -166,16 +174,6 @@ public class GameController implements Runnable{
             }
         }
 
-        // draw death animation
-        while (!pacman.isAnimationOver()) {
-            System.out.println("called");
-            try {
-                Thread.sleep(30);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            view.update(pacman, ghostManager, map, level);
-        }
     }
 
     ///////////////
@@ -192,7 +190,7 @@ public class GameController implements Runnable{
 
     public void initGame() {
         // set map
-        map.setMap(data.getMap(pacman, ghostManager));
+        map.setMap(data.loadMap(pacman, ghostManager, level));
 
         // update view
         view.update(pacman, ghostManager, map, level);
@@ -206,9 +204,9 @@ public class GameController implements Runnable{
 
 
     //reset lai
-    public void nextLevel() { // TODO....., ve them man choi
+    public void nextLevel() {
         // set map
-        map.setMap(data.getMap(pacman, ghostManager));
+        map.setMap(data.loadMap(pacman, ghostManager, level));
 
         // update view
         view.update(pacman, ghostManager, map, level);
