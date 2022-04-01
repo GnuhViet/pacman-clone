@@ -11,6 +11,11 @@ import java.util.List;
 
 public class PixelNumber {
     public static final String path = "src\\com\\pacman\\res\\Number.png";
+    public static enum FontType{
+        Small,
+        Medium,
+        Large
+    }
     private SpriteSheet numberSheet;
 
     public PixelNumber() throws IOException {
@@ -27,50 +32,36 @@ public class PixelNumber {
         return list.toArray();
     }
 
-    public void draw(Graphics2D g2d, int value, int x, int y, int size) {
-        int space;
+    public void draw(Graphics2D g2d, int value, int x, int y, FontType type) {
+        int space = 0;
         if (value < 0) {
             return;
         }
-        if (size == 10) {
-            space = Constants.CELL_SIZE / 3;
-            if (value < 10) {
-                g2d.drawImage(numberSheet.grabImage(0, value), x, y, null);
-                return;
-            }
-            Object[] number = toArray(value);
-            int n = number.length;
-            for (Object o : number) {
-                g2d.drawImage(numberSheet.grabImage(0, (int) o), x, y, null);
-                x += space;
-            }
+
+        int row = 0;
+        switch (type) {
+            case Small:
+                space = Constants.CELL_SIZE / 3;
+                break;
+            case Medium:
+                space = Constants.CELL_SIZE / 2;
+                row = 1;
+                break;
+            case Large:
+                space = Constants.CELL_SIZE;
+                row = 2;
+                break;
         }
 
-        if (size == 16) {
-            space = Constants.CELL_SIZE / 2;
-            if (value < 10) {
-                g2d.drawImage(numberSheet.grabImage(1, value), x, y, null);
-                return;
-            }
-            Object[] number = toArray(value);
-            int n = number.length;
-            for (Object o : number) {
-                g2d.drawImage(numberSheet.grabImage(1, (int) o), x, y, null);
-                x += space;
-            }
+        if (value < 10) {
+            g2d.drawImage(numberSheet.grabImage(row, value), x, y, null);
+            return;
         }
-        if (size == 32) {
-            space = Constants.CELL_SIZE;
-            if (value < 10) {
-                g2d.drawImage(numberSheet.grabImage(2, value), x, y, null);
-                return;
-            }
-            Object[] number = toArray(value);
-            int n = number.length;
-            for (Object o : number) {
-                g2d.drawImage(numberSheet.grabImage(2, (int) o), x, y, null);
-                x += space;
-            }
+        Object[] number = toArray(value);
+        int n = number.length;
+        for (Object o : number) {
+            g2d.drawImage(numberSheet.grabImage(row, (int) o), x, y, null);
+            x += space;
         }
     }
 }

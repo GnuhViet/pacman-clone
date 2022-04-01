@@ -9,7 +9,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
 
-public class GameTitleUI {
+public class GameMainUI {
     private static final String GAME_TITLE = "PACMAN";
 
     private JFrame window;
@@ -18,7 +18,7 @@ public class GameTitleUI {
     private GameController controller;
     private Container con;
 
-    public GameTitleUI() {
+    public GameMainUI() {
         initFrame();
         initTileUI();
     }
@@ -118,23 +118,18 @@ public class GameTitleUI {
 
             if (buttonName.equals("StartButton.png")) {
                 titleUI.setVisible(false);
+                con.repaint();
 
                 try {
                     gameUI = new GameView();
+                    controller = new GameController(gameUI);
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
 
                 window.addKeyListener(gameUI);
                 window.setFocusable(true); // for key listener
-
                 con.add(gameUI);
-
-                try {
-                    controller = new GameController(gameUI);
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
 
                 controller.startGameThread();
                 return;

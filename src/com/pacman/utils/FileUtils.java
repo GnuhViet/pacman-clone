@@ -224,10 +224,6 @@ public class FileUtils {
             // nhay gia tri
             mapSketch = br.readLine().split(",");
             mapOutput = getMap(pacman, ghost, mapSketch);
-            for (int i = 0; i < Constants.MAP_WIDTH; i++) {
-                System.out.println(mapSketch[i]);
-            }
-
         } catch (IOException e) {
         } finally {
             try {

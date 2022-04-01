@@ -20,7 +20,7 @@ public class GameController implements Runnable{
     private boolean isFinish;
     private int level;
 
-    Thread gameThread;
+    Thread gameThread; //https://stackoverflow.com/questions/27593900
 
     ///////
     // Runnable method implements
@@ -40,7 +40,7 @@ public class GameController implements Runnable{
         long energizerTimer = 0; // energizer nhap nhay
         long blinkTimer = 0; // ghost nhap nhay khi gan het thoi gian frightened
         // thoi gian game, theo sec
-        int gameTimer = 0;
+        int gameTimerFirst2Sec = 0;
 
         countDownReady(false);
         lastTime = System.nanoTime();
@@ -75,26 +75,27 @@ public class GameController implements Runnable{
                 }
 
                 // 4. update ghost
-                ghostManager.update(map, pacman, gameTimer);
+                ghostManager.update(map, pacman, gameTimerFirst2Sec);
 
                 // 5. update view
                 view.update(pacman, ghostManager, map, level);
 
                 // 6. check kill pacman
                 if(ghostManager.isKillPacman()) {
-                    pacman.reset(false);
-                    ghostManager.reset(false);
-                    view.resetReadyTimer(); // 2 second
+                    if (pacman.getLive() != 0) {
+                        pacman.reset(false);
+                        ghostManager.reset(false);
+                        view.resetReadyTimer(); // 2 second
+                        gameTimerFirst2Sec = 0;
+                        pacman.decreaseLive();
+                    }
 
-                    gameTimer = 0; // FIXME Out of range
-                    pacman.decreaseLive();
+
                 }
 
                 // 7. Check lose
                 if (pacman.getLive() == 0) {
                     pacman.setAlive(false);
-                    view.setReady(true);
-                    view.setLose(true);
                     // draw death animation
                     while (!pacman.isAnimationOver()) {
                         try {
@@ -104,7 +105,6 @@ public class GameController implements Runnable{
                         }
                         view.update(pacman, ghostManager, map, level);
                     }
-
                     break; // out vong lap
                 }
 
@@ -129,9 +129,9 @@ public class GameController implements Runnable{
                 drawCount++;
             }
 
-            // neu bi an thi dem nguoc
+            // khong co gi de giai thich
             if (!view.getReady()) {
-                countDownReady(false);
+                countDownReady(true);
                 lastTime = System.nanoTime();
             }
 
@@ -156,7 +156,9 @@ public class GameController implements Runnable{
                 }
                 //System.out.println("FPS:" + drawCount);
                 ghostManager.phaseUpdate();
-                gameTimer += 1;
+                if (gameTimerFirst2Sec <= 3){
+                    gameTimerFirst2Sec += 1;
+                }
                 drawCount = 0;
                 fpsTimer = 0;
             }

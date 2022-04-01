@@ -1,6 +1,6 @@
 package com.pacman;
 
-import com.pacman.view.GameTitleUI;
+import com.pacman.view.GameMainUI;
 
 import java.awt.*;
 
@@ -8,7 +8,7 @@ public class PacmanApp {
 
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
-            GameTitleUI gameTitleUI = new GameTitleUI();
+            GameMainUI gameTitleUI = new GameMainUI();
         });
     }
 }

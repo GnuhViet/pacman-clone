@@ -20,6 +20,7 @@ public class Map {
 
     public void setMap(Constants.Cell[][] map) {
         this.map = map;
+        isEnergizerOff = false;
     }
 
     public Constants.Cell getMapItem(int x, int y) {
