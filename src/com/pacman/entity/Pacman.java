@@ -71,6 +71,7 @@ public class Pacman {
 
     public void setAlive(boolean alive) {
         isAlive = alive;
+        animationTimer = 0; // reset animation timer de ve tu dau
     }
 
     public boolean isAlive() {
@@ -115,6 +116,10 @@ public class Pacman {
 
     public boolean isAnimationOver() {
         return animationOver;
+    }
+
+    public void resetAnimationOver() {
+        animationOver = false;
     }
 
     ///////////

@@ -210,9 +210,20 @@ public class GameView extends JPanel implements KeyListener {
     };
 
     public void updateLoadingScreen() {
-        long start = System.nanoTime();
 
-        int middleX = Constants.SCREEN_WIDTH / 2;
+        // draw death animation
+        pacman.setAlive(false);
+        while (!pacman.isAnimationOver()) {
+            try {
+                Thread.sleep(40);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            this.update(pacman, ghostManager, map, level);
+        }
+        pacman.setAlive(true);
+        pacman.resetAnimationOver();
+
         int middleY = Constants.SCREEN_HEIGHT / 2;
         isLoading = true;
         loadingGhost.setPosition(Constants.SCREEN_WIDTH + Constants.CELL_SIZE * 2, middleY);
