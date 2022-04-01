@@ -21,10 +21,8 @@ public class GameView extends JPanel implements KeyListener {
     private int readyTimer;
     private int level;
     private int lastScore;
-    private int levelScore;
 
     private boolean isReady;
-    private boolean isLose;
     private boolean isLoading;
 
     private static final int dX = Constants.CELL_SIZE * Constants.MAP_WIDTH;
@@ -90,7 +88,6 @@ public class GameView extends JPanel implements KeyListener {
     private void initGame() throws IOException {
         this.setOpaque(true);
         this.setBackground(Color.BLACK);
-        isLose = false;
         isReady = false;
         isLoading = false;
         lastScore = 0;
@@ -125,9 +122,6 @@ public class GameView extends JPanel implements KeyListener {
         return isReady;
     }
 
-    public void setLose(boolean lose) {
-        this.isLose = lose;
-    }
 
     public void setReady(boolean ready) {
         isReady = ready;
@@ -142,11 +136,11 @@ public class GameView extends JPanel implements KeyListener {
     ////////////
     private void drawScore(Graphics2D g2d) throws IOException {
         g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\Score32.png"), 0, 0, null);
-        pixelNumber.draw(g2d, pacman.getScore(),86, 0, 16);
+        pixelNumber.draw(g2d, pacman.getScore(),86, 0, PixelNumber.FontType.Medium);
     }
 
     private void drawBonus(Graphics2D g2d) {
-        pixelNumber.draw(g2d, pacman.getBonus(), pacman.getPosition().x - Constants.CELL_SIZE / 4, pacman.getPosition().y, 10);
+        pixelNumber.draw(g2d, pacman.getBonus(), pacman.getPosition().x - Constants.CELL_SIZE / 4, pacman.getPosition().y, PixelNumber.FontType.Small);
     }
 
     private void drawLives(Graphics2D g2d) {
@@ -171,7 +165,7 @@ public class GameView extends JPanel implements KeyListener {
 
     private void drawReady(Graphics2D g2d) throws IOException {
         if (readyTimer > 1) {
-            pixelNumber.draw(g2d, readyTimer - 1,(dX - 32) / 2, (dY + 32) / 2, 32);
+            pixelNumber.draw(g2d, readyTimer - 1,(dX - 32) / 2, (dY + 32) / 2, PixelNumber.FontType.Large);
             return;
         }
         g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\Ready.png"),(dX - 128) / 2,(dY + 32) / 2,null);
@@ -276,6 +270,6 @@ public class GameView extends JPanel implements KeyListener {
             levelScore = pacman.getScore();
         }
         g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\Score32.png"), Constants.SCREEN_WIDTH / 2 - 86, Constants.SCREEN_HEIGHT / 2 - Constants.SCREEN_BOTTOM_MARGIN, null);
-        pixelNumber.draw(g2d, levelScore,Constants.SCREEN_WIDTH / 2, Constants.SCREEN_HEIGHT / 2 - Constants.SCREEN_BOTTOM_MARGIN, 16);
+        pixelNumber.draw(g2d, levelScore,Constants.SCREEN_WIDTH / 2, Constants.SCREEN_HEIGHT / 2 - Constants.SCREEN_BOTTOM_MARGIN, PixelNumber.FontType.Medium);
     }
 }
