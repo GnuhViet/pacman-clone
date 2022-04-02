@@ -14,7 +14,7 @@ public class MapMakerApp {
     private JFrame window;
     private JPanel main;
     private Container con;
-    private char text;
+    private char text = '.';
 
     MapListener mapListener;
     ItemButtonListener itemButtonListener;

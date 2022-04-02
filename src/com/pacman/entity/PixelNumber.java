@@ -13,7 +13,8 @@ public class PixelNumber {
     public static final String path = "src\\com\\pacman\\res\\Number.png";
     public static enum FontType{
         Small,
-        Medium,
+        MediumWhite,
+        MediumBlack,
         Large
     }
     private SpriteSheet numberSheet;
@@ -32,6 +33,26 @@ public class PixelNumber {
         return list.toArray();
     }
 
+    public int getSize(int value, FontType type) {
+        int space = 0;
+        switch (type) {
+            case Small:
+                space = Constants.CELL_SIZE / 3;
+                break;
+            case MediumWhite:
+            case MediumBlack:
+                space = Constants.CELL_SIZE / 2 + 2;
+                break;
+            case Large:
+                space = Constants.CELL_SIZE;
+                break;
+        }
+
+        Object[] number = toArray(value);
+
+        return number.length * space;
+    }
+
     public void draw(Graphics2D g2d, int value, int x, int y, FontType type) {
         int space = 0;
         if (value < 0) {
@@ -43,13 +64,17 @@ public class PixelNumber {
             case Small:
                 space = Constants.CELL_SIZE / 3;
                 break;
-            case Medium:
-                space = Constants.CELL_SIZE / 2;
+            case MediumWhite:
+                space = Constants.CELL_SIZE / 2 + 2;
                 row = 1;
+                break;
+            case MediumBlack:
+                space = Constants.CELL_SIZE / 2 + 2;
+                row = 2;
                 break;
             case Large:
                 space = Constants.CELL_SIZE;
-                row = 2;
+                row = 3;
                 break;
         }
 
