@@ -209,6 +209,7 @@ public class GameMainUI {
                     gameUI.setVisible(true);
                     controller.startGameThread();
                 } else {
+                    endUI.setVisible(false);
                     titleUI.setVisible(true);
                     con.repaint();
                 }
