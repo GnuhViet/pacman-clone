@@ -74,7 +74,7 @@ public class MapMakerApp {
             northLb[i].setPreferredSize(new Dimension(Constants.CELL_SIZE + 10, Constants.CELL_SIZE + 10));
             westLb[i].setPreferredSize(new Dimension(Constants.CELL_SIZE + 10, Constants.CELL_SIZE + 10));
             northLb[i].setText("     " + (i + 1));
-            westLb[i].setText((i + 1)+ " ");
+            westLb[i].setText((i + 1) + " ");
         }
 
         panel.setLayout(new GridLayout(22, 22));
@@ -93,7 +93,7 @@ public class MapMakerApp {
         for (int i = 1; i < Constants.MAP_WIDTH + 1; i++) {
             for (int j = 0; j < Constants.MAP_HEIGHT + 1; j++) {
                 if (j == 0) {
-                    panel.add(westLb[i-1]);
+                    panel.add(westLb[i - 1]);
                 }
                 if (j != 0) {
                     jButtonMap[c] = new JButton(".");
@@ -288,10 +288,9 @@ public class MapMakerApp {
         public void mouseClicked(MouseEvent e) {
             JButton item = (JButton) e.getSource();
             item.setText(text + "");
-            if("#".equals(item.getText())) {
+            if ("#".equals(item.getText())) {
                 item.setBackground(Color.BLUE);
-            }
-            else {
+            } else {
                 item.setBackground(Color.BLACK);
             }
         }
@@ -300,10 +299,9 @@ public class MapMakerApp {
         public void mousePressed(MouseEvent e) {
             JButton item = (JButton) e.getSource();
             item.setText(text + "");
-            if("#".equals(item.getText())) {
+            if ("#".equals(item.getText())) {
                 item.setBackground(Color.BLUE);
-            }
-            else {
+            } else {
                 item.setBackground(Color.BLACK);
             }
         }
@@ -330,7 +328,7 @@ public class MapMakerApp {
         for (int i = 0; i < Constants.MAP_HEIGHT; i++) {
             builder.setLength(0);
             for (int j = 0; j < Constants.MAP_WIDTH; j++) {
-                builder.append(jButtonMap[i*Constants.MAP_WIDTH + j].getText());
+                builder.append(jButtonMap[i * Constants.MAP_WIDTH + j].getText());
             }
             res[i] = builder.toString();
         }

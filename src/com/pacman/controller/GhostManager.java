@@ -13,15 +13,15 @@ public class GhostManager {
     private int phaseCount = 1;
 
     /* 4 Phase:
-    * 1. Scatter for 7 seconds, then Chase for 20 seconds.
-    * 2. Scatter for 7 seconds, then Chase for 20 seconds.
-    * 3. Scatter for 5 seconds, then Chase for 20 seconds.
-    * 4. Scatter for 5 seconds, then switch to Chase mode permanently.
+     * 1. Scatter for 7 seconds, then Chase for 20 seconds.
+     * 2. Scatter for 7 seconds, then Chase for 20 seconds.
+     * 3. Scatter for 5 seconds, then Chase for 20 seconds.
+     * 4. Scatter for 5 seconds, then switch to Chase mode permanently.
      */ // source: https://gameinternals.com/understanding-pac-man-ghost-behavior
 
     public static final int NUMBER_OF_GHOSTS = 4;
 
-    public enum GhostType{
+    public enum GhostType {
         RED, //0
         PINK,//1
         BLUE,//2
@@ -156,7 +156,7 @@ public class GhostManager {
     public void draw(Graphics2D g2d, boolean beingEat, GhostType type) {
         for (int i = 0; i < 4; i++) {
             if (beingEat && i == type.ordinal()) {
-               continue;
+                continue;
             }
             ghosts[i].draw(i, g2d);
         }

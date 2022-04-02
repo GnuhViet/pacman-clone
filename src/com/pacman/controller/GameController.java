@@ -262,7 +262,7 @@ public class GameController implements Runnable {
                 view.setReady(true);
                 break;
             }
-
+            // kiem tra xem co nhan pause khong...
             if (view.getGameState() == GameView.GameState.Pause) {
                 synchronized (pauseLock) {
                     try {

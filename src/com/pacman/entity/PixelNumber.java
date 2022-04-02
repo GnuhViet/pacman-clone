@@ -11,12 +11,14 @@ import java.util.List;
 
 public class PixelNumber {
     public static final String path = "src\\com\\pacman\\res\\Number.png";
-    public static enum FontType{
+
+    public enum FontType {
         Small,
         MediumWhite,
         MediumBlack,
         Large
     }
+
     private SpriteSheet numberSheet;
 
     public PixelNumber() throws IOException {

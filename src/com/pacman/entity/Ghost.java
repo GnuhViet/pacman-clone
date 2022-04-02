@@ -132,7 +132,7 @@ public class Ghost {
     }
 
     public void updateFrightened(Pacman pacman) {
-        if (0 == frightenedMode && pacman.getEnergizerTimer() == Constants.ENERGIZER_DURATION) {
+        if (frightenedMode == 0 && Constants.ENERGIZER_DURATION == pacman.getEnergizerTimer()) {
             frightenedMode = 1;
             direction = (2 + direction) % 4;
         } else if (0 == pacman.getEnergizerTimer() && frightenedMode == 1) {
@@ -265,11 +265,11 @@ public class Ghost {
         int availableWay = 0;    // huong dang sau khong phai la huong di duoc
 
         int speed = Constants.GHOST_SPEED;
-        if (1 == frightenedMode) {
+        if (frightenedMode == 1) {
             speed = Constants.GHOST_FRIGHTENED_SPEED;
         }
         // outside grid
-        if (2 == frightenedMode && 0 == position.x % Constants.GHOST_ESCAPE_SPEED && 0 == position.y % Constants.GHOST_ESCAPE_SPEED) {
+        if (frightenedMode == 2 && position.x == 0 % Constants.GHOST_ESCAPE_SPEED && position.y == 0 % Constants.GHOST_ESCAPE_SPEED) {
             speed = Constants.GHOST_ESCAPE_SPEED;
         }
 

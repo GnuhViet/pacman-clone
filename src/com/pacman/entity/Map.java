@@ -45,8 +45,8 @@ public class Map {
     public boolean mapCollision(boolean iUseDoor, int iX, int iY) {
         boolean output = false;
 
-        double cellX = iX / (double)(Constants.CELL_SIZE);
-        double cellY = iY / (double)(Constants.CELL_SIZE) - Constants.SCREEN_TOP_MARGIN /(double) Constants.CELL_SIZE;
+        double cellX = iX / (double) (Constants.CELL_SIZE);
+        double cellY = iY / (double) (Constants.CELL_SIZE) - Constants.SCREEN_TOP_MARGIN / (double) Constants.CELL_SIZE;
 
         for (int i = 0; i < 4; i++) {
             int x = 0;
@@ -55,36 +55,32 @@ public class Map {
             switch (i) {
                 case 0://TOP LEFT CELL
                 {
-                    x = (int)Math.floor(cellX);
-                    y = (int)Math.floor(cellY);
+                    x = (int) Math.floor(cellX);
+                    y = (int) Math.floor(cellY);
                     break;
                 }
                 case 1: //TOP RIGHT
                 {
-                    x = (int)Math.ceil(cellX);
-                    y = (int)Math.floor(cellY);
+                    x = (int) Math.ceil(cellX);
+                    y = (int) Math.floor(cellY);
                     break;
                 }
-                case 2:
-                {
-                    x = (int)Math.floor(cellX);
-                    y = (int)Math.ceil(cellY);
+                case 2: {
+                    x = (int) Math.floor(cellX);
+                    y = (int) Math.ceil(cellY);
                     break;
                 }
-                case 3:
-                {
-                    x = (int)Math.ceil(cellX);
-                    y = (int)Math.ceil(cellY);
+                case 3: {
+                    x = (int) Math.ceil(cellX);
+                    y = (int) Math.ceil(cellY);
                 }
             }
 
             // kiem tra xem vi tri co trong map khong
-            if (0 <= x && 0 <= y && Constants.MAP_HEIGHT > y && Constants.MAP_WIDTH > x)
-            {
+            if (x >= 0 && y >= 0 && Constants.MAP_HEIGHT > y && Constants.MAP_WIDTH > x) {
                 if (Constants.Cell.Wall == map[y][x]) {
                     output = true;
-                }
-                else if (iUseDoor == false && Constants.Cell.Door == map[y][x]) {
+                } else if (iUseDoor == false && Constants.Cell.Door == map[y][x]) {
                     output = true;
                 }
             }
@@ -132,7 +128,7 @@ public class Map {
                             }
                         }
 
-                        if (b < Constants.MAP_WIDTH - 1) {
+                        if (Constants.MAP_WIDTH - 1 > b) {
                             if (Constants.Cell.Wall == map[a][b + 1]) {
                                 right = 1; // right
                             }
@@ -144,59 +140,29 @@ public class Map {
                             }
                         }
 
-                        if (a < Constants.MAP_HEIGHT - 1) {
+                        if (Constants.MAP_HEIGHT - 1 > a) {
                             if (Constants.Cell.Wall == map[a + 1][b]) {
                                 down = 1; // dow
                             }
                         }
 
-                        /*
-                        // check 4 goc
-                        int downLeft = 0;
-                        int downRight = 0;
-                        int upLeft = 0;
-                        int upRight = 0;
-
-                        if (0 < a && Constants.MAP_HEIGHT - 1 > a && 0 < b && Constants.MAP_WIDTH - 1 > b) {
-                            if (Constants.Cell.Wall == map[a + 1][b - 1] && down == 1 && left == 1) {  // down left
-                                downLeft = 1;
-                            }
-
-                            if (Constants.Cell.Wall == map[a + 1][b + 1] && down == 1 && right == 1) { // down right
-                                downRight = 1;
-                            }
-
-                            if (Constants.Cell.Wall == map[a - 1][b - 1] && up == 1 && left == 1) { // up left
-                                upLeft = 1;
-                            }
-
-                            if (Constants.Cell.Wall == map[a - 1][b + 1] && up == 1 && right == 1) { // up right
-                                upRight = 1;
-                            }
-                        }
-                        */
-
-                        ////////// down_left + 2down_right + 4up_left + 8up_right
-
                         //-------------------<         DISTRIBUTIVE PROPERTY!         >-----------------------
                         int pos = (down + 2 * (left + 2 * (right + 2 * up)));
-                        //int posY = (downLeft + 2 * (downRight + 2 * (upLeft + 2 * upRight)));
 
                         if (isBlueColor) {
                             g2d.drawImage(mapSprite.grabImage(1, pos), xPos, yPos, null);
-                        }
-                        else {
+                        } else {
                             g2d.drawImage(mapSprite.grabImage(0, pos), xPos, yPos, null);
                         }
 
                         // fix tuong
-                        if (a < Constants.MAP_HEIGHT - 1 && b > 0) {
+                        if (Constants.MAP_HEIGHT - 1 > a && b > 0) {
                             if (Constants.Cell.Wall == map[a + 1][b - 1] && down == 1 && left == 1) { // down left
                                 g2d.drawImage(mapSprite.grabImage(2, 4), xPos, yPos, null);
                             }
                         }
 
-                        if (a < Constants.MAP_HEIGHT - 1 && b < Constants.MAP_WIDTH - 1) {
+                        if (Constants.MAP_HEIGHT - 1 > a && Constants.MAP_WIDTH - 1 > b) {
                             if (Constants.Cell.Wall == map[a + 1][b + 1] && down == 1 && right == 1) { // down right
                                 g2d.drawImage(mapSprite.grabImage(2, 5), xPos, yPos, null);
                             }
@@ -208,7 +174,7 @@ public class Map {
                             }
                         }
 
-                        if (a > 0 && b < Constants.MAP_WIDTH - 1) {
+                        if (a > 0 && Constants.MAP_WIDTH - 1 > b) {
                             if (Constants.Cell.Wall == map[a - 1][b + 1] && up == 1 && right == 1) { // up right
                                 g2d.drawImage(mapSprite.grabImage(2, 7), xPos, yPos, null);
                             }
@@ -229,11 +195,11 @@ public class Map {
 
     public void mapUpdate(int x, int y) {
         if (Constants.Cell.Energizer == map[y][x]) {
-            map[y][x] =  Constants.Cell.Empty;
+            map[y][x] = Constants.Cell.Empty;
             return;
         }
         if (Constants.Cell.Pellet == map[y][x]) {
-            map[y][x] =  Constants.Cell.Empty;
+            map[y][x] = Constants.Cell.Empty;
         }
     }
 }
