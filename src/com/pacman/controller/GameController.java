@@ -109,7 +109,7 @@ public class GameController implements Runnable{
                 // 8. Check win
                 isWinLevel = isWinLevel();
                 if (isWinLevel) {
-                    if (level < 1) {
+                    if (level < 8) {
                         level += 1;
                         view.updateLoadingScreen();
                         view.resetReadyTimer(); // 2 second

@@ -67,7 +67,6 @@ public class GameMainUI {
         menuPanel.setOpaque(false);
 
         MenuButton startBtn = new MenuButton("StartButton.png");
-        MenuButton continueBtn = new MenuButton("ContinueButton.png");
         MenuButton scoreBtn = new MenuButton("ScoreButton.png");
         MenuButton optionBtn = new MenuButton("OptionsButton.png");
         MenuButton quitBtn = new MenuButton("QuitButton.png");
@@ -78,12 +77,10 @@ public class GameMainUI {
         c.gridy = 0;
         menuPanel.add(startBtn, c);
         c.gridy = 1;
-        menuPanel.add(continueBtn, c);
-        c.gridy = 2;
         menuPanel.add(scoreBtn, c);
-        c.gridy = 3;
+        c.gridy = 2;
         menuPanel.add(optionBtn, c);
-        c.gridy = 4;
+        c.gridy = 3;
         menuPanel.add(quitBtn, c);
 
         // add to title ui
@@ -253,11 +250,6 @@ public class GameMainUI {
                 con.add(gameUI);
 
                 controller.startGameThread();
-                return;
-            }
-
-            if (buttonName.equals("ContinueButton.png")) {
-                // TODO lam menu continue
                 return;
             }
 
