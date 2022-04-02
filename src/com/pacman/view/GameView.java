@@ -28,6 +28,17 @@ public class GameView extends JPanel implements KeyListener {
     private static final int dX = Constants.CELL_SIZE * Constants.MAP_WIDTH;
     private static final int dY = Constants.CELL_SIZE * Constants.MAP_HEIGHT + Constants.SCREEN_TOP_MARGIN * 2;
 
+    private GameMainUI mainUI;
+    private GameState state;
+
+    private boolean isWon;
+
+    public enum GameState{
+        Running,
+        Pause,
+        End
+    }
+
     ///////
     // JPanel methods override
     ///////
@@ -35,6 +46,10 @@ public class GameView extends JPanel implements KeyListener {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
+        if (GameState.End == state) {
+            this.setVisible(false);
+            mainUI.initEndUI(pacman.getScore(), isWon);
+        }
         try {
             if (isLoading) {
                 loadingPacman.draw(g2d);
@@ -81,7 +96,8 @@ public class GameView extends JPanel implements KeyListener {
     ////////////////////////
     /////// GameView methods
     ////////////////////////
-    public GameView() throws IOException {
+    public GameView(GameMainUI mainUI) throws IOException {
+        this.mainUI = mainUI;
         initGame();
     }
 
@@ -90,6 +106,7 @@ public class GameView extends JPanel implements KeyListener {
         this.setBackground(Color.BLACK);
         isReady = false;
         isLoading = false;
+        isWon = false;
         lastScore = 0;
         resetReadyTimer();
         // load sprite
@@ -122,7 +139,6 @@ public class GameView extends JPanel implements KeyListener {
         return isReady;
     }
 
-
     public void setReady(boolean ready) {
         isReady = ready;
     }
@@ -131,12 +147,17 @@ public class GameView extends JPanel implements KeyListener {
         readyTimer -=1;
     }
 
+    public void setEnd(boolean isWon) {
+        state = GameState.End;
+        this.isWon = isWon;
+    }
+
     /////////////
     /// draws methods
     ////////////
     private void drawScore(Graphics2D g2d) throws IOException {
         g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\Score32.png"), 0, 0, null);
-        pixelNumber.draw(g2d, pacman.getScore(),86, 0, PixelNumber.FontType.Medium);
+        pixelNumber.draw(g2d, pacman.getScore(),86, 0, PixelNumber.FontType.MediumWhite);
     }
 
     private void drawBonus(Graphics2D g2d) {
@@ -270,6 +291,6 @@ public class GameView extends JPanel implements KeyListener {
             levelScore = pacman.getScore();
         }
         g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\Score32.png"), Constants.SCREEN_WIDTH / 2 - 86, Constants.SCREEN_HEIGHT / 2 - Constants.SCREEN_BOTTOM_MARGIN, null);
-        pixelNumber.draw(g2d, levelScore,Constants.SCREEN_WIDTH / 2, Constants.SCREEN_HEIGHT / 2 - Constants.SCREEN_BOTTOM_MARGIN, PixelNumber.FontType.Medium);
+        pixelNumber.draw(g2d, levelScore,Constants.SCREEN_WIDTH / 2, Constants.SCREEN_HEIGHT / 2 - Constants.SCREEN_BOTTOM_MARGIN, PixelNumber.FontType.MediumWhite);
     }
 }

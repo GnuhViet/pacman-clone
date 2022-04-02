@@ -15,8 +15,7 @@ public class GameController implements Runnable{
     private Map map;
     private GameView view;
 
-    private boolean isWin;
-    private boolean isLose;
+    private boolean isWinLevel;
     private boolean isFinish;
     private int level;
 
@@ -82,15 +81,13 @@ public class GameController implements Runnable{
 
                 // 6. check kill pacman
                 if(ghostManager.isKillPacman()) {
+                    pacman.reset(false);
+                    ghostManager.reset(false);
+                    gameTimerFirst2Sec = 0;
+                    pacman.decreaseLive();
                     if (pacman.getLive() != 0) {
-                        pacman.reset(false);
-                        ghostManager.reset(false);
                         view.resetReadyTimer(); // 2 second
-                        gameTimerFirst2Sec = 0;
-                        pacman.decreaseLive();
                     }
-
-
                 }
 
                 // 7. Check lose
@@ -105,13 +102,14 @@ public class GameController implements Runnable{
                         }
                         view.update(pacman, ghostManager, map, level);
                     }
+                    view.setEnd(false);
                     break; // out vong lap
                 }
 
                 // 8. Check win
-                isWin = isWin();
-                if (isWin) {
-                    if (level < 8) {
+                isWinLevel = isWinLevel();
+                if (isWinLevel) {
+                    if (level < 1) {
                         level += 1;
                         view.updateLoadingScreen();
                         view.resetReadyTimer(); // 2 second
@@ -120,6 +118,7 @@ public class GameController implements Runnable{
                     }
                     else {
                         isFinish = true;
+                        view.setEnd(true);
                     }
                 }
 
@@ -175,7 +174,6 @@ public class GameController implements Runnable{
                 lastTime = System.nanoTime();
             }
         }
-
     }
 
     ///////////////
@@ -222,8 +220,7 @@ public class GameController implements Runnable{
 
     public void startGameThread() {
         gameThread = new Thread(this);
-        isWin = false;
-        isLose = false;
+        isWinLevel = false;
         isFinish = false;
         level = 1;
         gameThread.start();
@@ -262,7 +259,7 @@ public class GameController implements Runnable{
         map.resetColor();
     }
 
-    public boolean isWin() {
+    public boolean isWinLevel() {
         return map.isClear();
     }
 }
