@@ -22,10 +22,7 @@ public class GameMainUI {
 
     private EndUI endUI;
 
-    private MenuButtonListener buttonListener;
-
     public GameMainUI() {
-        buttonListener = new MenuButtonListener();
         initFrame();
         con = window.getContentPane();
         initTileUI();
@@ -55,16 +52,16 @@ public class GameMainUI {
         JLabel logo = new JLabel();
         logo.setIcon(new ImageIcon("src\\com\\pacman\\res\\menu-logo.png"));
         logoPanel.add(logo);
-        logoPanel.setBorder(new EmptyBorder(40,0,0,0));
+        logoPanel.setBorder(new EmptyBorder(40, 0, 0, 0));
         logoPanel.setOpaque(false);
 
         // Menu panel config
         menuPanel.setAlignmentY(Component.CENTER_ALIGNMENT);
-        menuPanel.setPreferredSize(new Dimension(300,290));
+        menuPanel.setPreferredSize(new Dimension(300, 290));
         menuPanel.setMaximumSize(new Dimension(300, 290));
 
         // can le ben duoi
-        menuPanel.setBorder(BorderFactory.createEmptyBorder(0,0,20,0));
+        menuPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
         menuPanel.setLayout(new GridBagLayout());
         menuPanel.setOpaque(false);
 
@@ -72,14 +69,10 @@ public class GameMainUI {
         MenuButton scoreBtn = new MenuButton("ScoreButton");
         MenuButton optionBtn = new MenuButton("OptionsButton");
         MenuButton quitBtn = new MenuButton("QuitButton");
-        startBtn.addMouseListener(buttonListener);
-        scoreBtn.addMouseListener(buttonListener);
-        optionBtn.addMouseListener(buttonListener);
-        quitBtn.addMouseListener(buttonListener);
 
         //add button to menu panel
         GridBagConstraints c = new GridBagConstraints();
-        c.insets = new Insets(0,0,5,0);
+        c.insets = new Insets(0, 0, 5, 0);
         c.gridy = 0;
         menuPanel.add(startBtn, c);
         c.gridy = 1;
@@ -97,9 +90,19 @@ public class GameMainUI {
         con.add(titleUI);
     }
 
+    private void initGame() { // initGameUI and new game
+        Object pauseLock = new Object();
+        try {
+            gameUI = new GameView(this, pauseLock, con);
+            controller = new GameController(gameUI, pauseLock);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
     // sub menu ui
     public void initEndUI(int score, boolean isWon) {
-        if(endUI != null) {
+        if (endUI != null) {
             endUI.setVisible(true);
             endUI.setWon(isWon);
             window.removeKeyListener(gameUI);
@@ -123,6 +126,15 @@ public class GameMainUI {
         window.setFocusable(true);
     }
 
+    public void showMainUi() {
+        titleUI.setVisible(true);
+        window.removeKeyListener(gameUI);
+        con.repaint();
+    }
+
+    //////////////
+    //INNER CLASS
+    //////////////
     private class EndUI extends JPanel implements KeyListener {
         private PixelNumber pixelNumber;
         private int score;
@@ -150,26 +162,26 @@ public class GameMainUI {
             int highestScoreSize = pixelNumber.getSize(888222333, PixelNumber.FontType.MediumBlack);
 
             try {
-                g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\BackGround.jpg"), 0,0, null);
-                g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\YourScore.png"), width - (173+scoreSize) / 2, 455, null);
-                g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\YourHighestScore.png"), width - (292+highestScoreSize) / 2, 505, null);
+                g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\BackGround.jpg"), 0, 0, null);
+                g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\YourScore.png"), width - (173 + scoreSize) / 2, 455, null);
+                g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\YourHighestScore.png"), width - (292 + highestScoreSize) / 2, 505, null);
 
                 if (this.isWon) {
-                    g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\GameWon.png"), width-300, -50, null);
+                    g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\GameWon.png"), width - 300, -50, null);
                 } else {
-                    g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\GameOver.png"), width-300, -50, null);
+                    g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\GameOver.png"), width - 300, -50, null);
                 }
 
                 if (this.yes) {
-                    g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\Yes.png"), width-300, -50, null);
+                    g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\Yes.png"), width - 300, -50, null);
                 } else {
-                    g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\No.png"), width-300, -50, null);
+                    g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\No.png"), width - 300, -50, null);
                 }
             } catch (IOException e) {
             }
 
-            pixelNumber.draw(g2d, this.score, width - (scoreSize) / 2 + 173/2, 450, PixelNumber.FontType.MediumBlack);
-            pixelNumber.draw(g2d, 888222333, width - (highestScoreSize) / 2 + 292/2, 500, PixelNumber.FontType.MediumBlack);
+            pixelNumber.draw(g2d, this.score, width - (scoreSize) / 2 + 173 / 2, 450, PixelNumber.FontType.MediumBlack);
+            pixelNumber.draw(g2d, 888222333, width - (highestScoreSize) / 2 + 292 / 2, 500, PixelNumber.FontType.MediumBlack);
         }
 
         @Override
@@ -178,16 +190,16 @@ public class GameMainUI {
 
         @Override
         public void keyPressed(KeyEvent e) {
-            if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+            if (KeyEvent.VK_LEFT == e.getKeyCode()) {
                 this.yes = true;
                 this.repaint();
                 return;
             }
-            if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+            if (KeyEvent.VK_RIGHT == e.getKeyCode()) {
                 this.yes = false;
                 this.repaint();
             }
-            if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+            if (KeyEvent.VK_ENTER == e.getKeyCode()) {
                 if (yes) {
                     initGame();
                     endUI.setVisible(false);
@@ -196,8 +208,8 @@ public class GameMainUI {
                     con.repaint();
                     gameUI.setVisible(true);
                     controller.startGameThread();
-                }
-                else {
+                } else {
+                    endUI.setVisible(false);
                     titleUI.setVisible(true);
                     con.repaint();
                 }
@@ -209,30 +221,44 @@ public class GameMainUI {
         }
     }
 
-    public void showMainUi() {
-        titleUI.setVisible(true);
-        window.removeKeyListener(gameUI);
-        con.repaint();
-    }
+    public class MenuButton extends JLabel implements MouseListener {
+        private static final String iconFolPath = "src\\com\\pacman\\res\\MenuButton\\";
+        String buttonName;
+        String iconName;
+        String activeIconName;
 
-    private void initGame() { // initGameUI
-        Object pauseLock = new Object();
-        try {
-            gameUI = new GameView(this, pauseLock, con);
-            controller = new GameController(gameUI, pauseLock);
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        ImageIcon norIcon;
+        ImageIcon actIcon;
+
+        public MenuButton(String iconName) {
+            super();
+            this.buttonName = iconName;
+            this.iconName = iconFolPath + iconName + ".png";
+            this.activeIconName = iconFolPath + "Active" + iconName + ".png";
+            norIcon = new ImageIcon(this.iconName);
+            actIcon = new ImageIcon(activeIconName);
+            this.setIcon(norIcon);
+            this.addMouseListener(this);
         }
-    }
 
-    // Image button Listener// TODO update thanh sprite
-    private class MenuButtonListener implements MouseListener {
+        public String getButtonName() {
+            return buttonName;
+        }
+
+        public void setActIcon() {
+            this.setIcon(actIcon);
+        }
+
+        public void setNorIcon() {
+            this.setIcon(norIcon);
+        }
+
         @Override
         public void mouseClicked(MouseEvent e) {
             MenuButton button = (MenuButton) e.getSource();
             String buttonName = button.getButtonName();
 
-            if (buttonName.equals("StartButton")) {
+            if ("StartButton".equals(buttonName)) {
                 titleUI.setVisible(false);
                 con.repaint();
                 initGame();
@@ -245,17 +271,17 @@ public class GameMainUI {
                 return;
             }
 
-            if (buttonName.equals("ScoreButton")) {
+            if ("ScoreButton".equals(buttonName)) {
                 return;
             }
 
-            if (buttonName.equals("OptionsButton")) {
+            if ("OptionsButton".equals(buttonName)) {
 
                 return;
             }
 
             // quit button
-            if (buttonName.equals("QuitButton")) {
+            if ("QuitButton".equals(buttonName)) {
                 System.exit(0);
             }
         }

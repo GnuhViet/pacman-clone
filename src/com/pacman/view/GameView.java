@@ -110,10 +110,10 @@ public class GameView extends JPanel implements KeyListener {
     public void keyPressed(KeyEvent e) {
         key = e.getKeyCode();
         // stop
-        if (key == KeyEvent.VK_P || key == KeyEvent.VK_ESCAPE && !isLoading) {
-            if (gameState == GameState.Running) {
+        if (KeyEvent.VK_P == key || KeyEvent.VK_ESCAPE == key && !isLoading) {
+            if ( GameState.Running == gameState) {
                 gameState = GameState.Pause;
-            } else if (gameState == GameState.Pause) {
+            } else if (GameState.Pause == gameState) {
                 gameState = GameState.Running;
                 synchronized (pauseLock) {
                     pauseLock.notifyAll();
@@ -121,7 +121,7 @@ public class GameView extends JPanel implements KeyListener {
             }
         }
 
-        if (gameState == GameState.Pause) {
+        if (GameState.Pause == gameState) {
             if (KeyEvent.VK_UP == key) {
                 if (pauseMenuIndex > 0) {
                     pauseMenuIndex--;
@@ -129,8 +129,8 @@ public class GameView extends JPanel implements KeyListener {
                 }
             }
             if (KeyEvent.VK_DOWN == key) {
-                if (pauseMenuIndex < 2){
-                    pauseMenuIndex ++;
+                if (pauseMenuIndex < 2) {
+                    pauseMenuIndex++;
                     repaint();
                 }
             }
@@ -279,12 +279,12 @@ public class GameView extends JPanel implements KeyListener {
     private Pacman loadingPacman = new Pacman() {
         @Override
         public void update(int key, Map map) {
-            if (key == KeyEvent.VK_LEFT) {
+            if (KeyEvent.VK_LEFT == key) {
                 this.setDirection(2);
                 this.getPosition().x -= Constants.PACMAN_SPEED + 1;
                 return;
             }
-            if (key == KeyEvent.VK_RIGHT) {
+            if (KeyEvent.VK_RIGHT == key) {
                 this.setDirection(0);
                 this.getPosition().x += Constants.PACMAN_SPEED + 1;
             }
@@ -338,7 +338,7 @@ public class GameView extends JPanel implements KeyListener {
         double delta = 0;
         long lastTime = System.nanoTime();
         long currentTime;
-        while (loadingPacman.getPosition().x > -Constants.CELL_SIZE * 4) {
+        while (-Constants.CELL_SIZE * 4 < loadingPacman.getPosition().x) {
             currentTime = System.nanoTime();
             delta += (currentTime - lastTime) / drawInterval;
             lastTime = currentTime;
@@ -354,7 +354,7 @@ public class GameView extends JPanel implements KeyListener {
         loadingGhost.setPosition(-Constants.CELL_SIZE, middleY);
         loadingPacman.setPosition(-Constants.CELL_SIZE * 3, middleY);
         lastTime = System.nanoTime();
-        while (loadingPacman.getPosition().x < Constants.SCREEN_WIDTH + Constants.CELL_SIZE * 3) {
+        while (Constants.SCREEN_WIDTH + Constants.CELL_SIZE * 3 > loadingPacman.getPosition().x) {
             currentTime = System.nanoTime();
             delta += (currentTime - lastTime) / drawInterval;
             lastTime = currentTime;

@@ -148,19 +148,19 @@ public class Pacman {
         // down
         wall[3] = map.mapCollision(false, position.x, position.y + Constants.PACMAN_SPEED);
 
-        if (key == KeyEvent.VK_RIGHT) {
+        if (KeyEvent.VK_RIGHT == key) {
             if (!wall[0]) /// neu co tuong thi khong di duoc
                 direction = 0;
         }
-        if (key == KeyEvent.VK_UP) {
+        if (KeyEvent.VK_UP == key) {
             if (!wall[1])
                 direction = 1;
         }
-        if (key == KeyEvent.VK_LEFT) {
+        if (KeyEvent.VK_LEFT == key) {
             if (!wall[2])
                 direction = 2;
         }
-        if (key == KeyEvent.VK_DOWN) {
+        if (KeyEvent.VK_DOWN == key) {
             if (!wall[3])
                 direction = 3;
         }
@@ -228,13 +228,11 @@ public class Pacman {
         if (isAlive) {
             g2d.drawImage(pacmanSprite.grabImage(direction, frame), position.x, position.y, null);
             animationTimer = (animationTimer + 1) % (Constants.PACMAN_ANIMATION_SPEED * Constants.PACMAN_ANIMATION_FRAMES);
-        }
-        else {
-            if (animationTimer < Constants.PACMAN_DEATH_FRAMES * Constants.PACMAN_ANIMATION_SPEED) {
+        } else {
+            if (Constants.PACMAN_DEATH_FRAMES * Constants.PACMAN_ANIMATION_SPEED > animationTimer) {
                 animationTimer++;
                 g2d.drawImage(pacmanDeadSprite.grabImage(0, frame), position.x, position.y, null);
-            }
-            else {
+            } else {
                 animationOver = true;
             }
         }

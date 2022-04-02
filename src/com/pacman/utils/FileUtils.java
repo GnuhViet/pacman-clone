@@ -4,203 +4,68 @@ import com.pacman.controller.GhostManager;
 import com.pacman.entity.Pacman;
 
 import java.io.*;
+import java.util.LinkedList;
 import java.util.List;
 
 public class FileUtils {
-
     private static final String gameDataPath = "src\\com\\pacman\\res\\data\\map.txt";
-    private static final String gameSavePath = "src\\com\\pacman\\res\\data\\save.txt";
 
-    private static final String[] mapSketch7 = {
-            "#####################",
-            "#...................#",
-            "#.#.###.#####.###.#.#",
-            "#.#o..#...#...#..o#.#",
-            "#.###.#.#.#.#.#.###.#",
-            "#.###.#.#.#.#.#.###.#",
-            "........#...#........",
-            "###.###.#####.###.###",
-            "  #.###...0...###.#  ",
-            "  #.....##=##.....#  ",
-            "  #.###.#312#.###.#  ",
-            "  #...#.#####.#...#  ",
-            "  ###...........###  ",
-            "#####.#.#####.#.#####",
-            "......#...#...#......",
-            "#.#.#####.#.#####.#.#",
-            "#.#o......P......o#.#",
-            "#.###.#.#####.#.###.#",
-            "#.###.#...#...#.###.#",
-            "#.....###...###.....#",
-            "#####################"
-    };
-    private static final String[] mapSketch6 = { // 21 x 21
-            "#####################",
-            "#...................#",
-            "#.#.###.#####.###.#.#",
-            "#.#o###.#...#.###o#.#",
-            "#.#.....#.#.#.....#.#",
-            "#.###.#.#.#.#.#.###.#",
-            "#.....#...#...#.....#",
-            "###.#####.#.#####.###",
-            "###...#...0...#...###",
-            "....#.#.##=##.#.#....",
-            "#####...#213#...#####",
-            "....#.#.#####.#.#....",
-            "###...#.......#...###",
-            "  #.#.###.#.###.#.#  ",
-            "  #.#.....#.....#.#  ",
-            "###.###.#.#.#.###.###",
-            "#.......#.P.#.......#",
-            "#.###.#.#####.#.###.#",
-            "#.#o..#.#####.#..o#.#",
-            "#...#...........#...#",
-            "#####################"
-    };
+    public List<String[]> loadListMap() {
+        List<String[]> mapList = new LinkedList<String[]>();
 
-    private static final String[] mapSketch5 = { // 21 x 21
-            "#####################",
-            "#.....#.......#.....#",
-            "#.###.#.#####.#.###.#",
-            "#o.................o#",
-            "##.#.####.#.####.#.##",
-            "##.#.####.#.####.#.##",
-            "...#......#......#...",
-            "##.####.#####.####.##",
-            " #........0........# ",
-            " #.####.##=##.####.# ",
-            " #.##...#213#...##.# ",
-            "##.##.#.#####.#.##.##",
-            "......#.......#......",
-            "##.######.#.######.##",
-            " #........#........# ",
-            "##.####.#####.####.##",
-            "#.........P.........#",
-            "#.###.###.#.###.###.#",
-            "#o###.#...#...#.###o#",
-            "#.......#...#.......#",
-            "#####################"
-    };
+        File f = new File(gameDataPath);
+        FileReader fr = null;
+        BufferedReader br = null;
 
-    private static final String[] mapSketch4 = { // 21 x 21
-            "#####################",
-            "#.......#.o.#.......#",
-            "#.#####.#.#.#.#####.#",
-            "#.#.......#.......#.#",
-            "#...#.###.#.###.#...#",
-            "###.#...........#.###",
-            "....###.#####.###....",
-            "#.#.......0.......#.#",
-            "#.###.#.##=##.#.###.#",
-            "#.....#.#213#.#.....#",
-            "#o##.##.#####.##.##o#",
-            "#.#...............#.#",
-            "#...#.###.#.###.#...#",
-            "##.##.#...#...#.##.##",
-            "#.....#.#####.#.....#",
-            "#.#.#.....P.....#.#.#",
-            "#.###.###.#.###.###.#",
-            "#.....#...#...#.....#",
-            "#.###.#.#####.#.###.#",
-            "#.....#...o...#.....#",
-            "#####################"
-    };
+        // mapString
+        String[] mapSketch;
 
-    private static final String[] mapSketch3 = { // 21 x 21
-            "#####################",
-            "......#.......#......",
-            "#####.#.#####.#.#####",
-            "#.........#.........#",
-            "#.#####.#.#.#.#####.#",
-            "#o#.....#...#.....#o#",
-            "#.#.###.#####.###.#.#",
-            "#.....#...0...#.....#",
-            "#####.#.##=##.#.#####",
-            "#.....#.#213#.#.....#",
-            "#.###...#####...###.#",
-            "#...#.#.......#.#...#",
-            "###.#.##.###.##.#.###",
-            "  #.#.##.###.##.#.#  ",
-            "  #......###......#  ",
-            "###.####.###.####.###",
-            ".......#..P..#.......",
-            "###.##.#.###.#.##.###",
-            "#o#.##.#.###.#.##.#o#",
-            "#...................#",
-            "#####################"
-    };
+        try {
+            fr = new FileReader(f);
+            br = new BufferedReader(fr);
+            String level;
 
-    private static final String[] mapSketch2 = { // 21 x 21
-            "# ########.######## #",
-            "#.......o# #o.......#",
-            "##.##.#### ####.##.##",
-            " #.................# ",
-            "##.##.#.#####.#.##.##",
-            " .....#...#...#..... ",
-            "#####.### # ###.#####",
-            "#  #..    0    ..#  #",
-            "####### ##=## #######",
-            "    ..# #213# #..    ",
-            "#####.# ##### #.#####",
-            "#o....#       #....o#",
-            "#####.# ## ## #.#####",
-            " #.......# #.......# ",
-            "##.##.#### ####.##.##",
-            "  ..#.....P.....#..  ",
-            "###.#.#.#####.#.#.###",
-            "#.....#.......#.....#",
-            "#.##.##.##.##.##.##.#",
-            "# #.....o#.#o.....# #",
-            "# ########.######## #"
-    };
+            while ((level = br.readLine()) != null) {
+                mapSketch = level.split(",");
+                mapList.add(mapSketch);
+            }
+        } catch (IOException e) {
+        } finally {
+            try {
+                br.close();
+                fr.close();
+            } catch (IOException e) {
+            }
+        }
 
-    private static final String[] mapSketch1 = { // 21 x 21
-            " ################### ",
-            " #........#........# ",
-            " #o##.###.#.###.##o# ",
-            " #.................# ",
-            " #.##.#.#####.#.##.# ",
-            " #....#...#...#....# ",
-            " ####.### # ###.#### ",
-            "    #.#   0   #.#    ",
-            "#####.# ##=## #.#####",
-            "     .  #213#  .     ",
-            "#####.# ##### #.#####",
-            "    #.#       #.#    ",
-            " ####.# ##### #.#### ",
-            " #........#........# ",
-            " #.##.###.#.###.##.# ",
-            " #o.#.....P.....#.o# ",
-            " ##.#.#.#####.#.#.## ",
-            " #....#...#...#....# ",
-            " #.######.#.######.# ",
-            " #.................# ",
-            " ################### "
-    };
+        return mapList;
+    }
 
-    private static final String[] mapSketchz = { // 21 x 21
-            " ################### ",
-            " #        #        # ",
-            " # ## ### # ### ## # ",
-            " #                 # ",
-            " # ## # ##### # ## # ",
-            " #    #   #   #    # ",
-            " #### ### # ### #### ",
-            "    # #   0   # #    ",
-            "##### # ##=## # #####",
-            "        #213#        ",
-            "##### # ##### # #####",
-            "    # #       # #    ",
-            " #### # ##### # #### ",
-            " #        #        # ",
-            " # ## ### # ### ## # ",
-            " #  #  ...P     #  # ",
-            " ## # # ##### # # ## ",
-            " #    #   #   #    # ",
-            " # ###### # ###### # ",
-            " #                 # ",
-            " ################### "
-    };
+    public void writeMap(List<String[]> mapList, String filePath) {
+        File f = new File(filePath);
+        FileWriter fw = null;
+        BufferedWriter bw = null;
+
+        try {
+            fw = new FileWriter(f);
+            bw = new BufferedWriter(fw);
+            for (String[] x : mapList) {
+                for (int i = 0; i < Constants.MAP_WIDTH; i++) {
+                    bw.write(x[i] + ",");
+                }
+                bw.newLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                bw.close();
+                fw.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     public Constants.Cell[][] loadMap(Pacman pacman, GhostManager ghost, int level) {
         File f = new File(gameDataPath);
@@ -234,58 +99,6 @@ public class FileUtils {
         }
 
         return mapOutput;
-    }
-
-    public void writeMap() {
-        File f = new File(gameDataPath);
-        FileWriter fw = null;
-        BufferedWriter bw = null;
-
-        try {
-            fw = new FileWriter(f);
-            bw = new BufferedWriter(fw);
-
-            for (int i = 0; i < Constants.MAP_WIDTH; i++) {
-                bw.write(mapSketch7[i] + ","); // FIXME ?? meo chay duoc khong hieu vi sao
-            }
-            bw.newLine();
-
-            for (int i = 0; i < Constants.MAP_WIDTH; i++) {
-                bw.write(mapSketch1[i] + ","); // FIXME ?? meo chay duoc khong hieu vi sao
-            }
-            bw.newLine();
-
-            for (int i = 0; i < Constants.MAP_WIDTH; i++) {
-                bw.write(mapSketch2[i] + ","); // FIXME ?? meo chay duoc khong hieu vi sao
-            }
-            bw.newLine();
-
-            for (int i = 0; i < Constants.MAP_WIDTH; i++) {
-                bw.write(mapSketch3[i] + ","); // FIXME ?? meo chay duoc khong hieu vi sao
-            }
-            bw.newLine();
-
-            for (int i = 0; i < Constants.MAP_WIDTH; i++) {
-                bw.write(mapSketch4[i] + ","); // FIXME ?? meo chay duoc khong hieu vi sao
-            }
-            bw.newLine();
-
-            for (int i = 0; i < Constants.MAP_WIDTH; i++) {
-                bw.write(mapSketch5[i] + ","); // FIXME ?? meo chay duoc khong hieu vi sao
-            }
-            bw.newLine();
-
-            System.out.println("xong");
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                bw.close();
-                fw.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     private Constants.Cell[][] getMap(Pacman pacman, GhostManager ghost, String[] mapSketch) {
@@ -326,11 +139,5 @@ public class FileUtils {
             }
         }
         return mapOutput;
-    }
-
-
-    public static void main(String[] args) {
-        FileUtils fileUtils = new FileUtils();
-        fileUtils.writeMap();
     }
 }

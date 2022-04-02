@@ -123,6 +123,7 @@ public class GameController implements Runnable {
                         this.nextLevel();
                         lastTime = System.nanoTime();
                     } else {
+                        view.drawDeathAnimation(); // TODO TEST THIS
                         isFinish = true;
                         view.setEnd(true);
                     }
@@ -192,6 +193,7 @@ public class GameController implements Runnable {
         map = new Map();
         this.view = view;
         this.pauseLock = pauseLock;
+        level = 1;
         initGame();
     }
 
@@ -229,7 +231,6 @@ public class GameController implements Runnable {
         gameThread = new Thread(this);
         isWinLevel = false;
         isFinish = false;
-        level = 1;
         gameThread.start();
     }
 
@@ -262,7 +263,7 @@ public class GameController implements Runnable {
                 view.setReady(true);
                 break;
             }
-
+            // kiem tra xem co nhan pause khong...
             if (view.getGameState() == GameView.GameState.Pause) {
                 synchronized (pauseLock) {
                     try {
