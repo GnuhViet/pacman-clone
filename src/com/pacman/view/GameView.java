@@ -24,16 +24,21 @@ public class GameView extends JPanel implements KeyListener {
 
     private boolean isReady;
     private boolean isLoading;
+    private boolean isDrawGhost;
 
     private static final int dX = Constants.CELL_SIZE * Constants.MAP_WIDTH;
     private static final int dY = Constants.CELL_SIZE * Constants.MAP_HEIGHT + Constants.SCREEN_TOP_MARGIN * 2;
 
     private GameMainUI mainUI;
-    private GameState state;
+    private GameState gameState;
+
+    Container container;
 
     private boolean isWon;
+    private final Object pauseLock;
+    private int pauseMenuIndex;
 
-    public enum GameState{
+    public enum GameState {
         Running,
         Pause,
         End
@@ -46,7 +51,7 @@ public class GameView extends JPanel implements KeyListener {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
-        if (GameState.End == state) {
+        if (GameState.End == gameState) {
             this.setVisible(false);
             mainUI.initEndUI(pacman.getScore(), isWon);
         }
@@ -63,14 +68,31 @@ public class GameView extends JPanel implements KeyListener {
                 if (pacman.isDrawBonus()) {
                     this.drawBonus(g2d);
                     ghostManager.draw(g2d, true, pacman.getGhostKilled());
-                }
-                else {
+                } else {
                     pacman.draw(g2d);
-                    ghostManager.draw(g2d, false, GhostManager.GhostType.FRIGHTENED);
+                    if (isDrawGhost) {
+                        ghostManager.draw(g2d, false, GhostManager.GhostType.FRIGHTENED);
+                    }
                 }
                 if (!isReady) {
                     this.drawReady(g2d);
                 }
+            }
+            if (GameState.Pause == gameState) {
+                int middle = Constants.SCREEN_WIDTH / 2;
+                int location = 0;
+                switch (pauseMenuIndex) {
+                    case 0:
+                        location = 155;
+                        break;
+                    case 1:
+                        location = 195;
+                        break;
+                    case 2:
+                        location = 240;
+                }
+                g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\Pause.png"), middle - 300, 200, null);
+                g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\arrowV.png"), middle - 300 + 180, 200 + location, null);
             }
         } catch (IOException e) {
         }
@@ -87,6 +109,58 @@ public class GameView extends JPanel implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         key = e.getKeyCode();
+        // stop
+        if (key == KeyEvent.VK_P || key == KeyEvent.VK_ESCAPE && !isLoading) {
+            if (gameState == GameState.Running) {
+                gameState = GameState.Pause;
+            } else if (gameState == GameState.Pause) {
+                gameState = GameState.Running;
+                synchronized (pauseLock) {
+                    pauseLock.notifyAll();
+                }
+            }
+        }
+
+        if (gameState == GameState.Pause) {
+            if (KeyEvent.VK_UP == key) {
+                if (pauseMenuIndex > 0) {
+                    pauseMenuIndex--;
+                    repaint();
+                }
+            }
+            if (KeyEvent.VK_DOWN == key) {
+                if (pauseMenuIndex < 2){
+                    pauseMenuIndex ++;
+                    repaint();
+                }
+            }
+            if (KeyEvent.VK_ENTER == key) {
+                switch (pauseMenuIndex) {
+                    case 0: // back to the game... yeahhhhhh
+                        gameState = GameState.Running;
+                        synchronized (pauseLock) {
+                            pauseLock.notifyAll();
+                        }
+                        break;
+                    case 1:
+                        //N.A
+                        break;
+                    case 2: {
+                        while (pacman.getLive() > 0) {
+                            pacman.decreaseLive(); // giam live de game dung lai
+                        }
+                        gameState = GameState.Running;
+                        synchronized (pauseLock) {
+                            pauseLock.notifyAll();
+                        }
+                        container.remove(this);
+                        mainUI.showMainUi();
+                    }
+                }
+            }
+        }
+
+
     }
 
     @Override
@@ -96,23 +170,29 @@ public class GameView extends JPanel implements KeyListener {
     ////////////////////////
     /////// GameView methods
     ////////////////////////
-    public GameView(GameMainUI mainUI) throws IOException {
+    public GameView(GameMainUI mainUI, Object pauseLock, Container container) throws IOException {
         this.mainUI = mainUI;
+        this.pauseLock = pauseLock;
+        pixelNumber = new PixelNumber();
+        item = new SpriteSheet(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\Item.png"));
+        this.container = container;
         initGame();
     }
 
     private void initGame() throws IOException {
         this.setOpaque(true);
         this.setBackground(Color.BLACK);
+        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         isReady = false;
         isLoading = false;
         isWon = false;
+        isDrawGhost = true;
         lastScore = 0;
+        gameState = GameState.Running;
+        pauseMenuIndex = 0;
         resetReadyTimer();
-        // load sprite
-        pixelNumber = new PixelNumber();
-        item = new SpriteSheet(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\Item.png"));
     }
+
 
     public void resetReadyTimer() {
         isReady = false;
@@ -144,12 +224,16 @@ public class GameView extends JPanel implements KeyListener {
     }
 
     public void decreaseTimer() {
-        readyTimer -=1;
+        readyTimer -= 1;
     }
 
     public void setEnd(boolean isWon) {
-        state = GameState.End;
+        gameState = GameState.End;
         this.isWon = isWon;
+    }
+
+    public GameState getGameState() {
+        return gameState;
     }
 
     /////////////
@@ -157,7 +241,7 @@ public class GameView extends JPanel implements KeyListener {
     ////////////
     private void drawScore(Graphics2D g2d) throws IOException {
         g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\Score32.png"), 0, 0, null);
-        pixelNumber.draw(g2d, pacman.getScore(),86, 0, PixelNumber.FontType.MediumWhite);
+        pixelNumber.draw(g2d, pacman.getScore(), 86, 0, PixelNumber.FontType.MediumWhite);
     }
 
     private void drawBonus(Graphics2D g2d) {
@@ -169,7 +253,7 @@ public class GameView extends JPanel implements KeyListener {
         int dX = 100;
         int dY = Constants.SCREEN_HEIGHT - Constants.SCREEN_BOTTOM_MARGIN + Constants.CELL_SIZE / 3;
         for (int i = 0; i < n; i++) {
-            g2d.drawImage(item.grabImage(0,0), dX, dY, null);
+            g2d.drawImage(item.grabImage(0, 0), dX, dY, null);
             dX += Constants.CELL_SIZE + Constants.CELL_SIZE / 4;
         }
     }
@@ -179,17 +263,17 @@ public class GameView extends JPanel implements KeyListener {
         int dY = Constants.SCREEN_HEIGHT - Constants.SCREEN_BOTTOM_MARGIN + Constants.CELL_SIZE / 3;
         for (int i = 0; i < level; i++) {
             dX -= (Constants.CELL_SIZE + Constants.CELL_SIZE / 4);
-            g2d.drawImage(item.grabImage(0,i+1), dX, dY, null);
+            g2d.drawImage(item.grabImage(0, i + 1), dX, dY, null);
 
         }
     }
 
     private void drawReady(Graphics2D g2d) throws IOException {
         if (readyTimer > 1) {
-            pixelNumber.draw(g2d, readyTimer - 1,(dX - 32) / 2, (dY + 32) / 2, PixelNumber.FontType.Large);
+            pixelNumber.draw(g2d, readyTimer - 1, (dX - 32) / 2, (dY + 32) / 2, PixelNumber.FontType.Large);
             return;
         }
-        g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\Ready.png"),(dX - 128) / 2,(dY + 32) / 2,null);
+        g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\Ready.png"), (dX - 128) / 2, (dY + 32) / 2, null);
     }
 
     private Pacman loadingPacman = new Pacman() {
@@ -224,10 +308,8 @@ public class GameView extends JPanel implements KeyListener {
         }
     };
 
-    public void updateLoadingScreen() {
-
-        // draw death animation
-        pacman.setAlive(false);
+    public void drawDeathAnimation() {
+        isDrawGhost = false;
         while (!pacman.isAnimationOver()) {
             try {
                 Thread.sleep(40);
@@ -236,6 +318,12 @@ public class GameView extends JPanel implements KeyListener {
             }
             this.update(pacman, ghostManager, map, level);
         }
+        isDrawGhost = true;
+    }
+
+    public void updateLoadingScreen() {
+        pacman.setAlive(false);
+        drawDeathAnimation();
         pacman.setAlive(true);
         pacman.resetAnimationOver();
 
@@ -246,11 +334,11 @@ public class GameView extends JPanel implements KeyListener {
         loadingPacman.setAlive(true);
 
         // trai sang phai
-        double drawInterval = 1000000000/(double)Constants.FPS; // drawn 1 frame in 0.0166sec
+        double drawInterval = 1000000000 / (double) Constants.FPS; // drawn 1 frame in 0.0166sec
         double delta = 0;
         long lastTime = System.nanoTime();
         long currentTime;
-        while(loadingPacman.getPosition().x > -Constants.CELL_SIZE * 4) {
+        while (loadingPacman.getPosition().x > -Constants.CELL_SIZE * 4) {
             currentTime = System.nanoTime();
             delta += (currentTime - lastTime) / drawInterval;
             lastTime = currentTime;
@@ -263,8 +351,8 @@ public class GameView extends JPanel implements KeyListener {
         }
 
         // phai sang trai
-        loadingGhost.setPosition(- Constants.CELL_SIZE, middleY);
-        loadingPacman.setPosition(- Constants.CELL_SIZE * 3 , middleY);
+        loadingGhost.setPosition(-Constants.CELL_SIZE, middleY);
+        loadingPacman.setPosition(-Constants.CELL_SIZE * 3, middleY);
         lastTime = System.nanoTime();
         while (loadingPacman.getPosition().x < Constants.SCREEN_WIDTH + Constants.CELL_SIZE * 3) {
             currentTime = System.nanoTime();
@@ -291,6 +379,6 @@ public class GameView extends JPanel implements KeyListener {
             levelScore = pacman.getScore();
         }
         g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\Score32.png"), Constants.SCREEN_WIDTH / 2 - 86, Constants.SCREEN_HEIGHT / 2 - Constants.SCREEN_BOTTOM_MARGIN, null);
-        pixelNumber.draw(g2d, levelScore,Constants.SCREEN_WIDTH / 2, Constants.SCREEN_HEIGHT / 2 - Constants.SCREEN_BOTTOM_MARGIN, PixelNumber.FontType.MediumWhite);
+        pixelNumber.draw(g2d, levelScore, Constants.SCREEN_WIDTH / 2, Constants.SCREEN_HEIGHT / 2 - Constants.SCREEN_BOTTOM_MARGIN, PixelNumber.FontType.MediumWhite);
     }
 }

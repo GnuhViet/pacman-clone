@@ -288,7 +288,7 @@ public class FileUtils {
         }
     }
 
-    public Constants.Cell[][] getMap(Pacman pacman, GhostManager ghost, String[] mapSketch) {
+    private Constants.Cell[][] getMap(Pacman pacman, GhostManager ghost, String[] mapSketch) {
         Constants.Cell[][] mapOutput = new Constants.Cell[Constants.MAP_WIDTH][Constants.MAP_HEIGHT];
 
         for (int i = 0; i < Constants.MAP_WIDTH; i++) {
