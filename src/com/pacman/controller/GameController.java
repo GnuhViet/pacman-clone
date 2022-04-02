@@ -8,7 +8,7 @@ import com.pacman.view.GameView;
 
 import java.io.IOException;
 
-public class GameController implements Runnable{
+public class GameController implements Runnable {
     private FileUtils data;
     private Pacman pacman;
     private GhostManager ghostManager;
@@ -24,11 +24,13 @@ public class GameController implements Runnable{
     ///////
     // Runnable method implements
     //////
+    private final Object pauseLock;
+
     @Override
     public void run() {
         // 1 sec = 1000000000 nanosec
         // draw 60fps
-        double drawInterval = 1000000000/(double)Constants.FPS; // drawn 1 frame in 0.0166sec
+        double drawInterval = 1000000000 / (double) Constants.FPS; // drawn 1 frame in 0.0166sec
         double delta = 0;
         long lastTime = 0;
         long currentTime;
@@ -45,6 +47,7 @@ public class GameController implements Runnable{
         lastTime = System.nanoTime();
 
         while (!isFinish) {
+
             // draw 60fps
             currentTime = System.nanoTime();
             delta += (currentTime - lastTime) / drawInterval;
@@ -79,13 +82,24 @@ public class GameController implements Runnable{
                 // 5. update view
                 view.update(pacman, ghostManager, map, level);
 
+                // check pause
+                if (view.getGameState() == GameView.GameState.Pause) {
+                    synchronized (pauseLock) {
+                        try {
+                            pauseLock.wait();
+                            lastTime = System.nanoTime();
+                        } catch (InterruptedException e) {
+                        }
+                    }
+                }
+
                 // 6. check kill pacman
-                if(ghostManager.isKillPacman()) {
-                    pacman.reset(false);
-                    ghostManager.reset(false);
+                if (ghostManager.isKillPacman()) {
                     gameTimerFirst2Sec = 0;
                     pacman.decreaseLive();
                     if (pacman.getLive() != 0) {
+                        pacman.reset(false);
+                        ghostManager.reset(false);
                         view.resetReadyTimer(); // 2 second
                     }
                 }
@@ -94,14 +108,7 @@ public class GameController implements Runnable{
                 if (pacman.getLive() == 0) {
                     pacman.setAlive(false);
                     // draw death animation
-                    while (!pacman.isAnimationOver()) {
-                        try {
-                            Thread.sleep(40);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        view.update(pacman, ghostManager, map, level);
-                    }
+                    view.drawDeathAnimation();
                     view.setEnd(false);
                     break; // out vong lap
                 }
@@ -109,14 +116,13 @@ public class GameController implements Runnable{
                 // 8. Check win
                 isWinLevel = isWinLevel();
                 if (isWinLevel) {
-                    if (level < 1) {
+                    if (level < 8) {
                         level += 1;
                         view.updateLoadingScreen();
                         view.resetReadyTimer(); // 2 second
                         this.nextLevel();
                         lastTime = System.nanoTime();
-                    }
-                    else {
+                    } else {
                         isFinish = true;
                         view.setEnd(true);
                     }
@@ -155,7 +161,7 @@ public class GameController implements Runnable{
                 }
                 //System.out.println("FPS:" + drawCount);
                 ghostManager.phaseUpdate();
-                if (gameTimerFirst2Sec <= 3){
+                if (gameTimerFirst2Sec <= 3) {
                     gameTimerFirst2Sec += 1;
                 }
                 drawCount = 0;
@@ -179,12 +185,13 @@ public class GameController implements Runnable{
     ///////////////
     // Controller methods
     ///////////////
-    public GameController(GameView view) throws IOException {
+    public GameController(GameView view, Object pauseLock) throws IOException {
         data = new FileUtils();
         pacman = new Pacman();
         ghostManager = new GhostManager();
         map = new Map();
         this.view = view;
+        this.pauseLock = pauseLock;
         initGame();
     }
 
@@ -226,7 +233,7 @@ public class GameController implements Runnable{
         gameThread.start();
     }
 
-    public void countDownReady(boolean isMapBlink) {
+    public synchronized void countDownReady(boolean isMapBlink) {
         long lastTime = System.nanoTime();
         long currentTime;
         long readyTimer = 0; // dem ready time
@@ -254,6 +261,17 @@ public class GameController implements Runnable{
             if (readyTimer >= 1000000000L * Constants.READY_TIME) {
                 view.setReady(true);
                 break;
+            }
+
+            if (view.getGameState() == GameView.GameState.Pause) {
+                synchronized (pauseLock) {
+                    try {
+                        view.update(pacman, ghostManager, map, level);
+                        pauseLock.wait();
+                        lastTime = System.nanoTime();
+                    } catch (InterruptedException e) {
+                    }
+                }
             }
         }
         map.resetColor();

@@ -22,7 +22,10 @@ public class GameMainUI {
 
     private EndUI endUI;
 
+    private MenuButtonListener buttonListener;
+
     public GameMainUI() {
+        buttonListener = new MenuButtonListener();
         initFrame();
         con = window.getContentPane();
         initTileUI();
@@ -41,7 +44,6 @@ public class GameMainUI {
 
     private void initTileUI() {
         titleUI = new ImagePanel("src\\com\\pacman\\res\\title-background.jpg");
-
         // Title panel config
         titleUI.setLayout(new BoxLayout(titleUI, BoxLayout.Y_AXIS));
 
@@ -66,11 +68,14 @@ public class GameMainUI {
         menuPanel.setLayout(new GridBagLayout());
         menuPanel.setOpaque(false);
 
-        MenuButton startBtn = new MenuButton("StartButton.png");
-        MenuButton continueBtn = new MenuButton("ContinueButton.png");
-        MenuButton scoreBtn = new MenuButton("ScoreButton.png");
-        MenuButton optionBtn = new MenuButton("OptionsButton.png");
-        MenuButton quitBtn = new MenuButton("QuitButton.png");
+        MenuButton startBtn = new MenuButton("StartButton");
+        MenuButton scoreBtn = new MenuButton("ScoreButton");
+        MenuButton optionBtn = new MenuButton("OptionsButton");
+        MenuButton quitBtn = new MenuButton("QuitButton");
+        startBtn.addMouseListener(buttonListener);
+        scoreBtn.addMouseListener(buttonListener);
+        optionBtn.addMouseListener(buttonListener);
+        quitBtn.addMouseListener(buttonListener);
 
         //add button to menu panel
         GridBagConstraints c = new GridBagConstraints();
@@ -78,12 +83,10 @@ public class GameMainUI {
         c.gridy = 0;
         menuPanel.add(startBtn, c);
         c.gridy = 1;
-        menuPanel.add(continueBtn, c);
-        c.gridy = 2;
         menuPanel.add(scoreBtn, c);
-        c.gridy = 3;
+        c.gridy = 2;
         menuPanel.add(optionBtn, c);
-        c.gridy = 4;
+        c.gridy = 3;
         menuPanel.add(quitBtn, c);
 
         // add to title ui
@@ -93,7 +96,6 @@ public class GameMainUI {
         // add to frame
         con.add(titleUI);
     }
-
 
     // sub menu ui
     public void initEndUI(int score, boolean isWon) {
@@ -196,7 +198,6 @@ public class GameMainUI {
                     controller.startGameThread();
                 }
                 else {
-                    endUI.setVisible(false);
                     titleUI.setVisible(true);
                     con.repaint();
                 }
@@ -208,42 +209,30 @@ public class GameMainUI {
         }
     }
 
-    private void initGame() {
+    public void showMainUi() {
+        titleUI.setVisible(true);
+        window.removeKeyListener(gameUI);
+        con.repaint();
+    }
+
+    private void initGame() { // initGameUI
+        Object pauseLock = new Object();
         try {
-            gameUI = new GameView(this);
-            controller = new GameController(gameUI);
+            gameUI = new GameView(this, pauseLock, con);
+            controller = new GameController(gameUI, pauseLock);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
 
-    // Image button // TODO update thanh sprite
-    private class MenuButton extends JLabel implements MouseListener {
-        private static final String iconFolPath = "src\\com\\pacman\\res\\MenuButton\\";
-        String buttonName;
-        String iconName;
-        String activeIconName;
-
-        ImageIcon norIcon;
-        ImageIcon actIcon;
-
-        public MenuButton(String iconName) {
-            super();
-            this.buttonName = iconName;
-            this.iconName = iconFolPath + iconName;
-            this.activeIconName = iconFolPath + "Active" + iconName;
-
-            norIcon = new ImageIcon(this.iconName);
-            actIcon = new ImageIcon(activeIconName);
-
-            this.setIcon(norIcon);
-            addMouseListener(this);
-        }
-
+    // Image button Listener// TODO update thanh sprite
+    private class MenuButtonListener implements MouseListener {
         @Override
         public void mouseClicked(MouseEvent e) {
+            MenuButton button = (MenuButton) e.getSource();
+            String buttonName = button.getButtonName();
 
-            if (buttonName.equals("StartButton.png")) {
+            if (buttonName.equals("StartButton")) {
                 titleUI.setVisible(false);
                 con.repaint();
                 initGame();
@@ -256,34 +245,31 @@ public class GameMainUI {
                 return;
             }
 
-            if (buttonName.equals("ContinueButton.png")) {
-                // TODO lam menu continue
+            if (buttonName.equals("ScoreButton")) {
                 return;
             }
 
-            if (buttonName.equals("ScoreButton.png")) {
-                return;
-            }
-
-            if (buttonName.equals("OptionsButton.png")) {
+            if (buttonName.equals("OptionsButton")) {
 
                 return;
             }
 
             // quit button
-            if (buttonName.equals("QuitButton.png")) {
+            if (buttonName.equals("QuitButton")) {
                 System.exit(0);
             }
         }
 
         @Override
         public void mousePressed(MouseEvent e) {
-            this.setIcon(actIcon);
+            MenuButton btn = (MenuButton) e.getSource();
+            btn.setActIcon();
         }
 
         @Override
         public void mouseReleased(MouseEvent e) {
-            this.setIcon(norIcon);
+            MenuButton btn = (MenuButton) e.getSource();
+            btn.setNorIcon();
         }
 
         @Override
