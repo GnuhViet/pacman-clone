@@ -4,10 +4,12 @@ import com.pacman.entity.Map;
 import com.pacman.entity.Pacman;
 import com.pacman.entity.Sound;
 import com.pacman.utils.Constants;
+import com.pacman.utils.DataBaseUtils;
 import com.pacman.utils.FileUtils;
 import com.pacman.view.GameView;
 
 import java.io.IOException;
+import java.sql.Date;
 
 public class GameController implements Runnable {
     private FileUtils data;
@@ -121,6 +123,7 @@ public class GameController implements Runnable {
                     sound.stop();
                     view.drawDeathAnimation();
                     view.setEnd(false);
+                    DataBaseUtils.savePlayerResult(new Date(System.currentTimeMillis()), pacman.getScore(), level, isFinish);
                     break; // out vong lap
                 }
 
