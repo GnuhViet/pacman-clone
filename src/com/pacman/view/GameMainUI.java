@@ -5,6 +5,7 @@ import com.pacman.entity.PixelNumber;
 import com.pacman.entity.Sound;
 import com.pacman.utils.BufferedImageLoader;
 import com.pacman.utils.Constants;
+import com.pacman.utils.DataBaseUtils;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -256,7 +257,8 @@ public class GameMainUI {
             Graphics2D g2d = (Graphics2D) g;
             int width = window.getWidth() / 2;
             int scoreSize = pixelNumber.getSize(this.score, PixelNumber.FontType.MediumBlack);
-            int highestScoreSize = pixelNumber.getSize(888222333, PixelNumber.FontType.MediumBlack);
+            int highestScore = DataBaseUtils.getHighestScore();
+            int highestScoreSize = pixelNumber.getSize(highestScore, PixelNumber.FontType.MediumBlack);
 
             try {
                 g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\BackGround.jpg"), 0, 0, null);
@@ -278,7 +280,7 @@ public class GameMainUI {
             }
 
             pixelNumber.draw(g2d, this.score, width - (scoreSize) / 2 + 173 / 2, 450, PixelNumber.FontType.MediumBlack);
-            pixelNumber.draw(g2d, 888222333, width - (highestScoreSize) / 2 + 292 / 2, 500, PixelNumber.FontType.MediumBlack);
+            pixelNumber.draw(g2d, highestScore, width - (highestScoreSize) / 2 + 292 / 2, 500, PixelNumber.FontType.MediumBlack);
         }
 
         @Override
