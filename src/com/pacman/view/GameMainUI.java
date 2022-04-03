@@ -2,31 +2,49 @@ package com.pacman.view;
 
 import com.pacman.controller.GameController;
 import com.pacman.entity.PixelNumber;
+import com.pacman.entity.Sound;
 import com.pacman.utils.BufferedImageLoader;
 import com.pacman.utils.Constants;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
+
 
 public class GameMainUI {
     private static final String GAME_TITLE = "PACMAN";
 
     private JFrame window;
+    private Container con;
     private ImagePanel titleUI;
+    private ImagePanel scoreUI;
+    private ImagePanel settingUI;
+    private Sound sound;
+    private boolean isSoundOn;
+
     private GameView gameUI;
     private GameController controller;
-    private Container con;
 
     private EndUI endUI;
+    private MenuState menuState;
+
+    enum MenuState {
+        Home,
+        Score,
+        Setting
+    }
 
     public GameMainUI() {
+        endUI = null;
+        sound = new Sound();
+        isSoundOn = false;
+        menuState = MenuState.Home;
         initFrame();
         con = window.getContentPane();
         initTileUI();
-        endUI = null;
     }
 
     private void initFrame() {
@@ -63,7 +81,7 @@ public class GameMainUI {
         // can le ben duoi
         menuPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
         menuPanel.setLayout(new GridBagLayout());
-        menuPanel.setOpaque(false);
+        menuPanel.setOpaque(false); // trong suot
 
         MenuButton startBtn = new MenuButton("StartButton");
         MenuButton scoreBtn = new MenuButton("ScoreButton");
@@ -90,7 +108,75 @@ public class GameMainUI {
         con.add(titleUI);
     }
 
-    private void initGame() { // initGameUI and new game
+    private void playSound() {
+        if (isSoundOn) {
+            sound.setFile(0);
+            sound.play();
+            sound.loop();
+            return;
+        }
+        sound.stop();
+    }
+
+    private void initScoreUI() {
+        scoreUI = new ImagePanel("src\\com\\pacman\\res\\title-background.jpg");
+        scoreUI.setLayout(new BoxLayout(scoreUI, BoxLayout.Y_AXIS));
+
+        String[][] playerList = new String[30][30];//DataBaseUtils.getPlayerResult();
+        String[] collum = {"NAME", "DATE", "SCORE", "LEVEL", "WIN"};
+
+        //sub panel
+        JPanel tablePanel = new JPanel();
+        JPanel buttonPanel = new JPanel();
+
+        // table panel config
+        tablePanel.setLayout(new BoxLayout(tablePanel, BoxLayout.Y_AXIS));
+        DefaultTableModel defaultTableModel = new DefaultTableModel(playerList, collum);
+        JTable playerTb = new JTable(defaultTableModel);
+
+        //table button panel
+        JPanel tableButtonPanel = new JPanel();
+        tableButtonPanel.add(new MenuButton("PreviousButton"));
+        tableButtonPanel.add(new MenuButton("NextButton")); // TODO handle this
+        tableButtonPanel.setOpaque(false);
+
+        tablePanel.add(playerTb);
+        tablePanel.add(tableButtonPanel);
+        tablePanel.setBorder(new EmptyBorder(40, 100, 0, 100));
+        tablePanel.setOpaque(false);
+
+        // button panel config
+        buttonPanel.add(new MenuButton("HomeButton"));
+        buttonPanel.setBorder(new EmptyBorder(40, 0, 100, 0));
+        buttonPanel.setOpaque(false);
+
+        scoreUI.add(tablePanel);
+        scoreUI.add(buttonPanel);
+
+        //add to ui
+        con.add(scoreUI);
+    }
+
+    private void initSettingUI() {
+        JPanel panel = new JPanel();
+        settingUI = new ImagePanel("src\\com\\pacman\\res\\title-background.jpg");
+
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBorder(BorderFactory.createEmptyBorder(350, 0, 0, 0));
+        panel.setOpaque(false);
+        MenuButton homeBtn = new MenuButton("HomeButton");
+        homeBtn.setBorder(BorderFactory.createEmptyBorder(40, 160, 0, 0));
+
+        panel.add(new MenuButton("SoundButton"));
+        panel.add(homeBtn);
+
+        // add to ui
+        settingUI.add(panel);
+        con.add(settingUI);
+    }
+
+    // initGameUI and new game
+    private void initGame() {
         Object pauseLock = new Object();
         try {
             gameUI = new GameView(this, pauseLock, con);
@@ -272,11 +358,32 @@ public class GameMainUI {
             }
 
             if ("ScoreButton".equals(buttonName)) {
+                initScoreUI();
+                titleUI.setVisible(false);
+                scoreUI.setVisible(true);
+                menuState = MenuState.Score;
                 return;
             }
 
             if ("OptionsButton".equals(buttonName)) {
+                initSettingUI();
+                titleUI.setVisible(false);
+                settingUI.setVisible(true);
+                menuState = MenuState.Setting;
+                return;
+            }
 
+            if ("HomeButton".equals(buttonName)) {
+                if (MenuState.Setting == menuState) {
+                    settingUI.setVisible(false);
+                    con.remove(settingUI);
+                } else if (MenuState.Score == menuState) {
+                    scoreUI.setVisible(false);
+                    con.remove(scoreUI);
+                }
+
+                titleUI.setVisible(true);
+                menuState = MenuState.Home;
                 return;
             }
 
@@ -289,11 +396,29 @@ public class GameMainUI {
         @Override
         public void mousePressed(MouseEvent e) {
             MenuButton btn = (MenuButton) e.getSource();
+
+            if ("SoundButton".equals(buttonName)) {
+                if (isSoundOn) {
+                    btn.setNorIcon();
+                    isSoundOn = false;
+                }
+                else {
+                    btn.setActIcon();
+                    isSoundOn = true;
+                }
+                playSound();
+                return;
+            }
+
             btn.setActIcon();
         }
 
         @Override
         public void mouseReleased(MouseEvent e) {
+            if ("SoundButton".equals(buttonName)) {
+                return;
+            }
+
             MenuButton btn = (MenuButton) e.getSource();
             btn.setNorIcon();
         }
@@ -306,4 +431,6 @@ public class GameMainUI {
         public void mouseExited(MouseEvent e) {
         }
     }
+
+
 }
