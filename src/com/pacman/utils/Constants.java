@@ -41,6 +41,8 @@ public interface Constants {
     public static final int ENERGIZER_SCORE = 50;
     public static final int GHOST_SCORE = 300;
 
+    public static final boolean SOUND_DEFAULT = true;
+
     enum Cell {
         Door,
         Empty,

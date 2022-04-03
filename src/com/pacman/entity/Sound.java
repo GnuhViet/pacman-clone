@@ -45,6 +45,9 @@ public class Sound {
 
     public void setFile(MenuSound type) {
         try {
+            if (clip != null && clip.isRunning()) {
+                clip.stop();
+            }
             AudioInputStream ais = AudioSystem.getAudioInputStream(files[type.ordinal()]);
             clip = AudioSystem.getClip();
             clip.open(ais);
@@ -54,18 +57,26 @@ public class Sound {
 
     public void setFile(GhostSound type) {
         try {
+            if (clip != null && clip.isRunning()) {
+                clip.stop();
+            }
             AudioInputStream ais = AudioSystem.getAudioInputStream(files[type.ordinal() + 3]);
             clip = AudioSystem.getClip();
             clip.open(ais);
+
         } catch (Exception e) {
         }
     }
 
     public void setFile(PacmanSound type) {
         try {
+            if (clip != null && clip.isRunning()) {
+                clip.stop();
+            }
             AudioInputStream ais = AudioSystem.getAudioInputStream(files[type.ordinal() + 6]);
             clip = AudioSystem.getClip();
             clip.open(ais);
+
         } catch (Exception e) {
         }
     }
@@ -83,7 +94,7 @@ public class Sound {
     }
 
     public void play() {
-        if (isSoundOn) {
+        if (isSoundOn && clip != null) {
             clip.start();
         }
     }
@@ -95,7 +106,7 @@ public class Sound {
     }
 
     public void stop() {
-        if (clip.isRunning()) {
+        if (clip != null) {
             clip.stop();
         }
     }

@@ -38,7 +38,12 @@ public class GameMainUI {
 
     public GameMainUI() {
         endUI = null;
-        sound = new Sound(false);
+        sound = new Sound(Constants.SOUND_DEFAULT);
+        if (sound.isSoundOn()) {
+            sound.setFile(Sound.MenuSound.MenuSound);
+            sound.play();
+        }
+
         menuState = MenuState.Home;
         initFrame();
         con = window.getContentPane();
@@ -166,7 +171,9 @@ public class GameMainUI {
     // initGameUI and new game
     private void initGame() {
         // stop music
-        sound.stop();
+        if (sound.isSoundOn()){
+            sound.stop();
+        }
 
         Object pauseLock = new Object();
         try {
