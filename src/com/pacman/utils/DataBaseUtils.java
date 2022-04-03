@@ -2,6 +2,8 @@ package com.pacman.utils;
 
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DataBaseUtils {
 
@@ -38,15 +40,61 @@ public class DataBaseUtils {
     }
 
 
-    private static showData(int page) {
+    public static String[][] getPlayerResult() { // FIXME
+        Connection conn = null;
+        Statement statement = null;
+        List<String> resList = new ArrayList<>();
 
-    }
+        String[][] res = new String[10][];
+        StringBuilder bd = new StringBuilder();
+        try {
+            // Ket noi den database
+            conn = DriverManager.getConnection(DB_URL, USER_NAME, PASSWORD);
+            // khoi tao doi
+            statement = conn.createStatement();
+            // Tạo câu truy vấn
+            String sql = "select * from playerscore";
+            // Thuc thi
+            ResultSet rs = statement.executeQuery(sql);
+            int c = 0;
+            while (rs.next() && c < 10) {
+                bd.setLength(0);
+                String date = rs.getString("date");
+                int score = rs.getInt("score");
+                int level = rs.getInt("level");
+                String winState = rs.getString("status");
+                bd.append(date);
+                bd.append(",");
+                bd.append(score);
+                bd.append(",");
+                bd.append(level);
+                bd.append(",");
+                bd.append(winState);
+                bd.append(",");
+                res[c] = bd.toString().split(",");
+                c++;
+            }
 
-
-    public static String[][] getPlayerResult(int page) {
-        //TODO chuoi: "Khang","2020","99999","8","WIN"
-        // NEU CO HON 30 BAN GHI THI CHI LOAD 30
-        return null;
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return res;
     }
 
 

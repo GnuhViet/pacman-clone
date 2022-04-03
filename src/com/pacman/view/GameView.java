@@ -153,8 +153,10 @@ public class GameView extends JPanel implements KeyListener {
                         synchronized (pauseLock) {
                             pauseLock.notifyAll();
                         }
+
                         conSound.stop();
                         pacSound.stop();
+                        this.setVisible(false);
                         container.remove(this);
                         mainUI.showMainUi();
                         break;

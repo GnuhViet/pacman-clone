@@ -43,6 +43,7 @@ public class GameMainUI {
         if (sound.isSoundOn()) {
             sound.setFile(Sound.MenuSound.MenuSound);
             sound.play();
+            sound.loop();
         }
 
         menuState = MenuState.Home;
@@ -116,8 +117,8 @@ public class GameMainUI {
         scoreUI = new ImagePanel("src\\com\\pacman\\res\\title-background.jpg");
         scoreUI.setLayout(new BoxLayout(scoreUI, BoxLayout.Y_AXIS));
 
-        String[][] playerList = new String[30][30];//DataBaseUtils.getPlayerResult();
-        String[] collum = {"NAME", "DATE", "SCORE", "LEVEL", "WIN"};
+        String[][] playerList = DataBaseUtils.getPlayerResult();
+        String[] collum = {"DATE", "SCORE", "LEVEL", "WIN"};
 
         //sub panel
         JPanel tablePanel = new JPanel();
@@ -126,7 +127,13 @@ public class GameMainUI {
         // table panel config
         tablePanel.setLayout(new BoxLayout(tablePanel, BoxLayout.Y_AXIS));
         DefaultTableModel defaultTableModel = new DefaultTableModel(playerList, collum);
+        defaultTableModel.insertRow(0, collum);
         JTable playerTb = new JTable(defaultTableModel);
+        playerTb.setFont(new Font("Arial", Font.BOLD, 18));
+        playerTb.setForeground(Color.WHITE);
+        playerTb.setRowHeight(50);
+        playerTb.setOpaque(false);
+        playerTb.setBackground(Color.DARK_GRAY);
 
         //table button panel
         JPanel tableButtonPanel = new JPanel();
@@ -300,6 +307,7 @@ public class GameMainUI {
             }
             if (KeyEvent.VK_ENTER == e.getKeyCode()) {
                 if (yes) {
+                    controller.killThread();
                     initGame();
                     endUI.setVisible(false);
                     window.addKeyListener(gameUI);
