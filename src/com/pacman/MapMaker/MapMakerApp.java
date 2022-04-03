@@ -188,7 +188,7 @@ public class MapMakerApp {
         });
 
         exportBtn.addActionListener(e -> {
-            data.writeMap(mapList, "src\\com\\pacman\\res\\data\\customMap.txt");
+            data.writeMap(mapList, "src\\com\\pacman\\res\\data\\customMap.dat");
         });
     }
 

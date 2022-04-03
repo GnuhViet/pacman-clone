@@ -116,8 +116,8 @@ public class GameMainUI {
     private void initScoreUI() {
         scoreUI = new ImagePanel("src\\com\\pacman\\res\\title-background.jpg");
         scoreUI.setLayout(new BoxLayout(scoreUI, BoxLayout.Y_AXIS));
-
-        String[][] playerList = DataBaseUtils.getPlayerResult();
+        int page = 0;
+        String[][] playerList = DataBaseUtils.getPlayerResult(page);
         String[] collum = {"DATE", "SCORE", "LEVEL", "WIN"};
 
         //sub panel

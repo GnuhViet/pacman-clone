@@ -40,7 +40,7 @@ public class DataBaseUtils {
     }
 
 
-    public static String[][] getPlayerResult() { // FIXME
+    public static String[][] getPlayerResult(int page) { // FIXME
         Connection conn = null;
         Statement statement = null;
         List<String> resList = new ArrayList<>();
@@ -53,17 +53,21 @@ public class DataBaseUtils {
             // khoi tao doi
             statement = conn.createStatement();
             // Tạo câu truy vấn
-            String sql = "select * from playerscore";
+            String sql = "select * from playerscore order by score DESC ";
             // Thuc thi
             ResultSet rs = statement.executeQuery(sql);
             int c = 0;
-            while (rs.next() && c < 10) {
+            while (c < page*10) {
+                c++;
+            }
+            while (rs.next() && c < page*10 + 10) {
                 bd.setLength(0);
                 String date = rs.getString("date");
                 int score = rs.getInt("score");
                 int level = rs.getInt("level");
                 String winState = rs.getString("status");
-                bd.append(date);
+                String[] day = date.split(" ");
+                bd.append(day[0]);
                 bd.append(",");
                 bd.append(score);
                 bd.append(",");
