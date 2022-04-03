@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class FileUtils {
-    private static final String gameDataPath = "src\\com\\pacman\\res\\data\\map.txt";
+    private static final String gameDataPath = "src\\com\\pacman\\res\\data\\map.dat";
 
     public List<String[]> loadListMap() {
         List<String[]> mapList = new LinkedList<String[]>();

@@ -144,9 +144,14 @@ public class GameController implements Runnable {
                         this.initGame();
                         lastTime = System.nanoTime();
                     } else {
+                        pacman.setAlive(false);
+                        sound.stop();
+                        soundPacman.stop();
                         view.drawDeathAnimation();
                         isFinish = true;
                         view.setEnd(true);
+                        view.update(pacman, ghostManager, map, level, sound, soundPacman);
+                        break;
                     }
                 }
 
@@ -250,6 +255,7 @@ public class GameController implements Runnable {
 
     public void killThread() {
         if (gameThread != null) {
+            isFinish = true;
             gameThread.stop();
         }
     }
