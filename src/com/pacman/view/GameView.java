@@ -38,6 +38,9 @@ public class GameView extends JPanel implements KeyListener {
     private final Object pauseLock;
     private int pauseMenuIndex;
 
+    private Sound conSound;
+    private Sound pacSound;
+
     public enum GameState {
         Running,
         Pause,
@@ -150,6 +153,8 @@ public class GameView extends JPanel implements KeyListener {
                         synchronized (pauseLock) {
                             pauseLock.notifyAll();
                         }
+                        conSound.stop();
+                        pacSound.stop();
                         container.remove(this);
                         mainUI.showMainUi();
                         break;
@@ -200,11 +205,13 @@ public class GameView extends JPanel implements KeyListener {
         readyTimer = Constants.READY_TIME;
     }
 
-    public void update(Pacman pacman, GhostManager ghostManager, Map map, int level) {
+    public void update(Pacman pacman, GhostManager ghostManager, Map map, int level, Sound conSound, Sound pacSound) {
         this.pacman = pacman;
         this.ghostManager = ghostManager;
         this.map = map;
         this.level = level;
+        this.conSound = conSound;
+        this.pacSound = pacSound;
         this.repaint();
     }
 
@@ -317,7 +324,7 @@ public class GameView extends JPanel implements KeyListener {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            this.update(pacman, ghostManager, map, level);
+            this.repaint();
         }
         isDrawGhost = true;
     }

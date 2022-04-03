@@ -90,7 +90,7 @@ public class GameController implements Runnable {
                 ghostManager.update(map, pacman, gameTimerFirst2Sec);
 
                 // 5. update view
-                view.update(pacman, ghostManager, map, level);
+                view.update(pacman, ghostManager, map, level, sound, soundPacman);
 
                 // check pause
                 if (view.getGameState() == GameView.GameState.Pause) {
@@ -194,7 +194,7 @@ public class GameController implements Runnable {
 
             // an duoc ghost thi draw diem bonus trong 1 sec
             if (pacman.isDrawBonus()) {
-                view.update(pacman, ghostManager, map, level);
+                view.update(pacman, ghostManager, map, level, sound, soundPacman);
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
@@ -229,7 +229,7 @@ public class GameController implements Runnable {
         map.setMap(data.loadMap(pacman, ghostManager, level));
 
         // update view
-        view.update(pacman, ghostManager, map, level);
+        view.update(pacman, ghostManager, map, level, sound, soundPacman);
 
         // move to right pos in map
         pacman.reset(true, sound, soundPacman);
@@ -243,6 +243,12 @@ public class GameController implements Runnable {
         isWinLevel = false;
         isFinish = false;
         gameThread.start();
+    }
+
+    public void killThread() {
+        if (gameThread != null) {
+            gameThread.stop();
+        }
     }
 
     public synchronized void countDownReady(boolean isMapBlink) {
@@ -264,13 +270,13 @@ public class GameController implements Runnable {
 
             if (isMapBlink && mapColorTimer >= 500000000) {
                 map.switchColor();
-                view.update(pacman, ghostManager, map, level);
+                view.update(pacman, ghostManager, map, level, sound, soundPacman);
                 mapColorTimer = 0;
             }
 
             if (numberTimer >= 1000000000) {
                 view.decreaseTimer();
-                view.update(pacman, ghostManager, map, level);
+                view.update(pacman, ghostManager, map, level, sound, soundPacman);
                 numberTimer = 0;
             }
             if (readyTimer >= 1000000000L * Constants.READY_TIME) {
@@ -281,7 +287,7 @@ public class GameController implements Runnable {
             if (view.getGameState() == GameView.GameState.Pause) {
                 synchronized (pauseLock) {
                     try {
-                        view.update(pacman, ghostManager, map, level);
+                        view.update(pacman, ghostManager, map, level, sound, soundPacman);
                         pauseLock.wait();
                         lastTime = System.nanoTime();
                     } catch (InterruptedException e) {

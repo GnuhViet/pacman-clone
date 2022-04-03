@@ -175,6 +175,10 @@ public class GameMainUI {
             sound.stop();
         }
 
+        if (controller != null) { // KILL THREAD GAME CU
+            controller.killThread();
+        }
+
         Object pauseLock = new Object();
         try {
             gameUI = new GameView(this, pauseLock, con);
@@ -211,6 +215,7 @@ public class GameMainUI {
     }
 
     public void showMainUi() {
+        sound.play();
         titleUI.setVisible(true);
         window.removeKeyListener(gameUI);
         con.repaint();
