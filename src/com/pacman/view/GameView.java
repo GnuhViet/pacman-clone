@@ -276,7 +276,7 @@ public class GameView extends JPanel implements KeyListener {
         g2d.drawImage(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\Ready.png"), (dX - 128) / 2, (dY + 32) / 2, null);
     }
 
-    private Pacman loadingPacman = new Pacman() {
+    private Pacman loadingPacman = new Pacman(false) {
         @Override
         public void update(int key, Map map) {
             if (KeyEvent.VK_LEFT == key) {

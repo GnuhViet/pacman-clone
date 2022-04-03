@@ -167,11 +167,13 @@ public class Ghost {
         }
     }
 
-    public void updateTarget(Point pacmanPos, int pacmanDirection, Point redGhostPosition) {
+    public void updateTarget(Pacman pacman, int pacmanDirection, Point redGhostPosition) {
+        Point pacmanPos = pacman.getPosition();
         if (iUseDoor) {
             if (position.equals(target)) {
                 if (homeExit.equals(target)) {// da di den exit
                     iUseDoor = false; // khong ve duoc nha nua..
+                    pacman.turnOffEatenSound();
                 } else if (home.equals(target)) {
                     frightenedMode = 0;
                     target.setLocation(homeExit);
@@ -273,7 +275,7 @@ public class Ghost {
             speed = Constants.GHOST_ESCAPE_SPEED;
         }
 
-        this.updateTarget(pacmanPos, pacmanDirection, redGhostPosition);
+        this.updateTarget(pacman, pacmanDirection, redGhostPosition);
 
         // check 4 ben xung quanh co la tuong khong
         boolean[] wall = new boolean[4];

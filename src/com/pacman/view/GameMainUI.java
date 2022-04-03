@@ -23,7 +23,6 @@ public class GameMainUI {
     private ImagePanel scoreUI;
     private ImagePanel settingUI;
     private Sound sound;
-    private boolean isSoundOn;
 
     private GameView gameUI;
     private GameController controller;
@@ -39,8 +38,12 @@ public class GameMainUI {
 
     public GameMainUI() {
         endUI = null;
-        sound = new Sound();
-        isSoundOn = false;
+        sound = new Sound(Constants.SOUND_DEFAULT);
+        if (sound.isSoundOn()) {
+            sound.setFile(Sound.MenuSound.MenuSound);
+            sound.play();
+        }
+
         menuState = MenuState.Home;
         initFrame();
         con = window.getContentPane();
@@ -108,16 +111,6 @@ public class GameMainUI {
         con.add(titleUI);
     }
 
-    private void playSound() {
-        if (isSoundOn) {
-            sound.setFile(0);
-            sound.play();
-            sound.loop();
-            return;
-        }
-        sound.stop();
-    }
-
     private void initScoreUI() {
         scoreUI = new ImagePanel("src\\com\\pacman\\res\\title-background.jpg");
         scoreUI.setLayout(new BoxLayout(scoreUI, BoxLayout.Y_AXIS));
@@ -177,10 +170,15 @@ public class GameMainUI {
 
     // initGameUI and new game
     private void initGame() {
+        // stop music
+        if (sound.isSoundOn()){
+            sound.stop();
+        }
+
         Object pauseLock = new Object();
         try {
             gameUI = new GameView(this, pauseLock, con);
-            controller = new GameController(gameUI, pauseLock);
+            controller = new GameController(gameUI, pauseLock, sound.isSoundOn());
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -218,6 +216,14 @@ public class GameMainUI {
         con.repaint();
     }
 
+    private void playMusic() {
+        if (!sound.isSoundOn()){
+            sound.stop();
+            return;
+        }
+        sound.setFile(Sound.MenuSound.MenuSound);
+        sound.play();
+    }
     //////////////
     //INNER CLASS
     //////////////
@@ -323,8 +329,18 @@ public class GameMainUI {
             this.activeIconName = iconFolPath + "Active" + iconName + ".png";
             norIcon = new ImageIcon(this.iconName);
             actIcon = new ImageIcon(activeIconName);
-            this.setIcon(norIcon);
             this.addMouseListener(this);
+
+            if ("SoundButton".equals(iconName)) {
+                if (sound.isSoundOn()) {
+                    this.setActIcon();
+                } else {
+                    this.setNorIcon();
+                }
+                return;
+            }
+
+            this.setIcon(norIcon);
         }
 
         public String getButtonName() {
@@ -398,15 +414,14 @@ public class GameMainUI {
             MenuButton btn = (MenuButton) e.getSource();
 
             if ("SoundButton".equals(buttonName)) {
-                if (isSoundOn) {
+                if (sound.isSoundOn()) {
                     btn.setNorIcon();
-                    isSoundOn = false;
-                }
-                else {
+                    sound.turnOffSound();
+                } else {
                     btn.setActIcon();
-                    isSoundOn = true;
+                    sound.turnOnSound();
                 }
-                playSound();
+                playMusic();
                 return;
             }
 

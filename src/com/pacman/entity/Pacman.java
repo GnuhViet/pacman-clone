@@ -31,17 +31,23 @@ public class Pacman {
     private boolean isDrawBonus;
     private GhostManager.GhostType ghostKilled;
 
+    ////////
+    //Sounds
+    ////////
+    private Sound soundPacman;
+    private Sound controllerSound;
+
     /////////////
     /// Methods
     ////////////
 
-    public Pacman() throws IOException {
+    public Pacman(boolean isSoundOn) throws IOException {
         position = new Point();
         pacmanSprite = new SpriteSheet(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\Entity\\Pacman32.png"));
         pacmanDeadSprite = new SpriteSheet(BufferedImageLoader.loadImage("src\\com\\pacman\\res\\Entity\\PacmanDeath32.png"));
-    }
 
-    public void reset(boolean isNewGame) {
+    }
+    public void reset(boolean isNewGame, Sound controllerSound, Sound soundPacman) {
         if (isNewGame) {
             startX = (position.x * Constants.CELL_SIZE);
             startY = (position.y * Constants.CELL_SIZE) + Constants.SCREEN_TOP_MARGIN;
@@ -49,6 +55,8 @@ public class Pacman {
             score = 0;
             bonus = 0;
             animationOver = false;
+            this.controllerSound = controllerSound;
+            this.soundPacman = soundPacman;
         }
 
         if (live == 0) {
@@ -133,6 +141,10 @@ public class Pacman {
 
     public void decreaseLive() {
         live--;
+        if (live == 0) {
+            soundPacman.setFile(Sound.PacmanSound.Death);
+            soundPacman.play();
+        }
     }
 
     public void update(int key, Map map) {
@@ -201,11 +213,34 @@ public class Pacman {
             energizerTimer = Constants.ENERGIZER_DURATION;
             score += Constants.ENERGIZER_SCORE;
             bonus = 0;
+
+            controllerSound.stop();
+            controllerSound.setFile(Sound.GhostSound.Frightened);
+            controllerSound.play();
+            controllerSound.loop();
         }
 
         if (Constants.Cell.Pellet == mapItem) {
             score += Constants.PELLET_SCORE;
+
+            if (energizerTimer == 0) {
+                soundPacman.setFile(Sound.PacmanSound.Wakawaka);
+                soundPacman.play();
+            }
         }
+    }
+
+    public void turnOffEatenSound() {
+        if (energizerTimer > 0) {
+            controllerSound.stop();
+            controllerSound.setFile(Sound.GhostSound.Frightened);
+            controllerSound.play();
+            controllerSound.loop();
+        }
+    }
+
+    public void stopSound() {
+        soundPacman.stop();
     }
 
     public void impactGhostWhenEnergizer(GhostManager.GhostType ghostKilled) {
@@ -213,12 +248,24 @@ public class Pacman {
         score += bonus;
         isDrawBonus = true;
         this.ghostKilled = ghostKilled;
+
+        controllerSound.stop();
+        controllerSound.setFile(Sound.GhostSound.Eaten);
+        controllerSound.play();
+        controllerSound.loop();
+
+        soundPacman.setFile(Sound.PacmanSound.EatGhost);
+        soundPacman.play();
     }
 
     public void reduceEnergizerTimer() {
         energizerTimer = Math.max(0, energizerTimer - 1);
         if (energizerTimer == 0) {
             bonus = 0; // reset bonus
+
+            controllerSound.stop();
+            controllerSound.setFile(Sound.GhostSound.Normal);
+            controllerSound.loop();
         }
     }
 

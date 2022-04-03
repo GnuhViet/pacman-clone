@@ -3,6 +3,7 @@ package com.pacman.controller;
 import com.pacman.entity.Ghost;
 import com.pacman.entity.Map;
 import com.pacman.entity.Pacman;
+import com.pacman.entity.Sound;
 import com.pacman.utils.Constants;
 
 import java.awt.*;

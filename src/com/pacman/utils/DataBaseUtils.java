@@ -17,16 +17,6 @@ public class DataBaseUtils {
     public static void savePlayerResult(String name, Date playDate, int Score, int level, boolean winState) {
         Connection conn = null;
         PreparedStatement pre = null;
-
-        Pacman pac = null;
-        try {
-            pac = new Pacman();
-        } catch (IOException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
-
-
         try {
             // Ket noi database
             conn = DriverManager.getConnection(DB_URL, USER_NAME, PASSWORD);

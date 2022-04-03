@@ -2,6 +2,7 @@ package com.pacman.controller;
 
 import com.pacman.entity.Map;
 import com.pacman.entity.Pacman;
+import com.pacman.entity.Sound;
 import com.pacman.utils.Constants;
 import com.pacman.utils.FileUtils;
 import com.pacman.view.GameView;
@@ -21,10 +22,15 @@ public class GameController implements Runnable {
 
     Thread gameThread; //https://stackoverflow.com/questions/27593900
 
+    private final Object pauseLock;
+
+    ///SOUND
+    private Sound sound;
+    private Sound soundPacman;
+
     ///////
     // Runnable method implements
     //////
-    private final Object pauseLock;
 
     @Override
     public void run() {
@@ -45,6 +51,10 @@ public class GameController implements Runnable {
 
         countDownReady(false);
         lastTime = System.nanoTime();
+
+        sound.setFile(Sound.GhostSound.Normal);
+        sound.play();
+        sound.loop();
 
         while (!isFinish) {
 
@@ -98,7 +108,7 @@ public class GameController implements Runnable {
                     gameTimerFirst2Sec = 0;
                     pacman.decreaseLive();
                     if (pacman.getLive() != 0) {
-                        pacman.reset(false);
+                        pacman.reset(false, sound, soundPacman);
                         ghostManager.reset(false);
                         view.resetReadyTimer(); // 2 second
                     }
@@ -108,6 +118,7 @@ public class GameController implements Runnable {
                 if (pacman.getLive() == 0) {
                     pacman.setAlive(false);
                     // draw death animation
+                    sound.stop();
                     view.drawDeathAnimation();
                     view.setEnd(false);
                     break; // out vong lap
@@ -118,12 +129,19 @@ public class GameController implements Runnable {
                 if (isWinLevel) {
                     if (level < 8) {
                         level += 1;
+
+                        sound.stop();
+                        soundPacman.stop();
+
+                        sound.setFile(Sound.MenuSound.Loading);
+                        sound.play();
+
                         view.updateLoadingScreen();
                         view.resetReadyTimer(); // 2 second
                         this.nextLevel();
                         lastTime = System.nanoTime();
                     } else {
-                        view.drawDeathAnimation(); // TODO TEST THIS
+                        view.drawDeathAnimation();
                         isFinish = true;
                         view.setEnd(true);
                     }
@@ -137,7 +155,12 @@ public class GameController implements Runnable {
 
             // khong co gi de giai thich
             if (!view.getReady()) {
+                sound.stop();
                 countDownReady(true);
+                sound.setFile(Sound.GhostSound.Normal);
+                sound.play();
+                sound.loop();
+
                 lastTime = System.nanoTime();
             }
 
@@ -186,14 +209,18 @@ public class GameController implements Runnable {
     ///////////////
     // Controller methods
     ///////////////
-    public GameController(GameView view, Object pauseLock) throws IOException {
+    public GameController(GameView view, Object pauseLock, boolean isSoundOn) throws IOException {
         data = new FileUtils();
-        pacman = new Pacman();
+        pacman = new Pacman(isSoundOn);
         ghostManager = new GhostManager();
         map = new Map();
+        sound = new Sound(isSoundOn);
+        soundPacman = new Sound(isSoundOn);
+
+        // defaults values
         this.view = view;
         this.pauseLock = pauseLock;
-        level = 1;
+        this.level = 1;
         initGame();
     }
 
@@ -205,14 +232,16 @@ public class GameController implements Runnable {
         view.update(pacman, ghostManager, map, level);
 
         // move to right pos in map
-        pacman.reset(true);
+        pacman.reset(true, sound, soundPacman);
 
         // move to right pos in map
         ghostManager.reset(true);
     }
 
+    ////////
+    //reset
+    ////////
 
-    //reset lai
     public void nextLevel() {
         // set map
         map.setMap(data.loadMap(pacman, ghostManager, level));
@@ -221,7 +250,7 @@ public class GameController implements Runnable {
         view.update(pacman, ghostManager, map, level);
 
         // move to right pos in map
-        pacman.reset(false);
+        pacman.reset(false, sound, soundPacman);
 
         // move to right pos in map
         ghostManager.reset(false);
@@ -240,6 +269,9 @@ public class GameController implements Runnable {
         long readyTimer = 0; // dem ready time
         long numberTimer = 0; // dem nguoc..
         long mapColorTimer = 0;
+
+        sound.setFile(Sound.MenuSound.Start);
+        sound.play();
 
         while (view.getReadyTimer() > 0) {
             currentTime = System.nanoTime();
