@@ -7,7 +7,7 @@ import java.util.List;
 
 public class DataBaseUtils {
 
-    private static String DB_URL = "jdbc:mysql://localhost:3306/test";
+    private static String DB_URL = "jdbc:mysql://localhost:3306/nhom10";
     private static String USER_NAME = "root";
     private static String PASSWORD = "";
 
