@@ -138,7 +138,7 @@ public class GameController implements Runnable {
 
                         view.updateLoadingScreen();
                         view.resetReadyTimer(); // 2 second
-                        this.nextLevel();
+                        this.initGame();
                         lastTime = System.nanoTime();
                     } else {
                         view.drawDeathAnimation();
@@ -236,24 +236,6 @@ public class GameController implements Runnable {
 
         // move to right pos in map
         ghostManager.reset(true);
-    }
-
-    ////////
-    //reset
-    ////////
-
-    public void nextLevel() {
-        // set map
-        map.setMap(data.loadMap(pacman, ghostManager, level));
-
-        // update view
-        view.update(pacman, ghostManager, map, level);
-
-        // move to right pos in map
-        pacman.reset(false, sound, soundPacman);
-
-        // move to right pos in map
-        ghostManager.reset(false);
     }
 
     public void startGameThread() {

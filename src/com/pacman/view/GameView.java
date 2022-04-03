@@ -143,9 +143,6 @@ public class GameView extends JPanel implements KeyListener {
                         }
                         break;
                     case 1:
-                        //N.A
-                        break;
-                    case 2: {
                         while (pacman.getLive() > 0) {
                             pacman.decreaseLive(); // giam live de game dung lai
                         }
@@ -155,6 +152,10 @@ public class GameView extends JPanel implements KeyListener {
                         }
                         container.remove(this);
                         mainUI.showMainUi();
+                        break;
+                    case 2: {
+                        System.exit(0);
+                        break;
                     }
                 }
             }
