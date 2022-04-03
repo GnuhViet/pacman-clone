@@ -7,17 +7,12 @@ import java.io.File;
 public class Sound {
     Clip clip;
     File[] files;
+    private boolean isSoundOn;
 
     public enum MenuSound {
         Start,
         Loading,
-        Music
-    }
-
-    public enum PacmanSound {
-        Wakawaka,
-        Death,
-        EatEnergizer
+        MenuSound
     }
 
     public enum GhostSound {
@@ -26,29 +21,82 @@ public class Sound {
         Eaten
     }
 
-    public Sound() {
-        files = new File[10];
-        files[0] = new File("src/com/pacman/res/Sounds/MenuSound.wav");
+    public enum PacmanSound {
+        Wakawaka,
+        Death,
+        EatGhost
     }
 
-    public void setFile(int i) {
+    public Sound(boolean isSoundOn) {
+        files = new File[9];
+        files[0] = new File("src\\com\\pacman\\res\\Sounds\\StartSound.wav");
+        files[1] = new File("src\\com\\pacman\\res\\Sounds\\LoadingSound.wav");
+        files[2] = new File("src\\com\\pacman\\res\\Sounds\\MenuSound.wav");
+
+        files[3] = new File("src\\com\\pacman\\res\\Sounds\\Ghost\\Normal.wav");
+        files[4] = new File("src\\com\\pacman\\res\\Sounds\\Ghost\\Frightened.wav");
+        files[5] = new File("src\\com\\pacman\\res\\Sounds\\Ghost\\Eaten.wav");
+
+        files[6] = new File("src\\com\\pacman\\res\\Sounds\\Pacman\\Wakawaka.wav");
+        files[7] = new File("src\\com\\pacman\\res\\Sounds\\Pacman\\DeathSound.wav");
+        files[8] = new File("src\\com\\pacman\\res\\Sounds\\Pacman\\EatGhost.wav");
+        this.isSoundOn = isSoundOn;
+    }
+
+    public void setFile(MenuSound type) {
         try {
-            AudioInputStream ais = AudioSystem.getAudioInputStream(files[0]);
+            AudioInputStream ais = AudioSystem.getAudioInputStream(files[type.ordinal()]);
             clip = AudioSystem.getClip();
             clip.open(ais);
         } catch (Exception e) {
         }
     }
 
+    public void setFile(GhostSound type) {
+        try {
+            AudioInputStream ais = AudioSystem.getAudioInputStream(files[type.ordinal() + 3]);
+            clip = AudioSystem.getClip();
+            clip.open(ais);
+        } catch (Exception e) {
+        }
+    }
+
+    public void setFile(PacmanSound type) {
+        try {
+            AudioInputStream ais = AudioSystem.getAudioInputStream(files[type.ordinal() + 6]);
+            clip = AudioSystem.getClip();
+            clip.open(ais);
+        } catch (Exception e) {
+        }
+    }
+
+    public void turnOnSound() {
+        isSoundOn = true;
+    }
+
+    public void  turnOffSound() {
+        isSoundOn = false;
+    }
+
+    public boolean isSoundOn() {
+        return isSoundOn;
+    }
+
     public void play() {
-        clip.start();
+        if (isSoundOn) {
+            clip.start();
+        }
     }
 
     public void loop() {
-        clip.loop(Clip.LOOP_CONTINUOUSLY);
+        if (isSoundOn) {
+            clip.loop(Clip.LOOP_CONTINUOUSLY);
+        }
     }
 
     public void stop() {
-        clip.stop();
+        if (clip.isRunning()) {
+            clip.stop();
+        }
     }
 }

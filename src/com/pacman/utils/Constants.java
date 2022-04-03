@@ -35,7 +35,7 @@ public interface Constants {
     public static final int SHORT_SCATTER_DURATION = 5;
 
     public static final int PACMAN_START_LIVES = 3;
-    public static final int READY_TIME = 4;
+    public static final int READY_TIME = 5;
 
     public static final int PELLET_SCORE = 10;
     public static final int ENERGIZER_SCORE = 50;

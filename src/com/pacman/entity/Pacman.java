@@ -31,6 +31,12 @@ public class Pacman {
     private boolean isDrawBonus;
     private GhostManager.GhostType ghostKilled;
 
+    ////////
+    //Sounds
+    ////////
+    private boolean isSoundOn;
+    private Sound sound;
+
     /////////////
     /// Methods
     ////////////

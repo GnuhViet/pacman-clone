@@ -2,6 +2,7 @@ package com.pacman.controller;
 
 import com.pacman.entity.Map;
 import com.pacman.entity.Pacman;
+import com.pacman.entity.Sound;
 import com.pacman.utils.Constants;
 import com.pacman.utils.FileUtils;
 import com.pacman.view.GameView;
@@ -21,10 +22,14 @@ public class GameController implements Runnable {
 
     Thread gameThread; //https://stackoverflow.com/questions/27593900
 
+    private final Object pauseLock;
+
+    ///SOUND
+    private boolean isSoundOn;
+    private Sound sound;
     ///////
     // Runnable method implements
     //////
-    private final Object pauseLock;
 
     @Override
     public void run() {
@@ -186,14 +191,18 @@ public class GameController implements Runnable {
     ///////////////
     // Controller methods
     ///////////////
-    public GameController(GameView view, Object pauseLock) throws IOException {
+    public GameController(GameView view, Object pauseLock, boolean isSoundOn) throws IOException {
         data = new FileUtils();
         pacman = new Pacman();
         ghostManager = new GhostManager();
         map = new Map();
+        sound = new Sound(isSoundOn);
+
+        // defaults values
         this.view = view;
         this.pauseLock = pauseLock;
-        level = 1;
+        this.level = 1;
+        this.isSoundOn = isSoundOn;
         initGame();
     }
 
@@ -211,8 +220,10 @@ public class GameController implements Runnable {
         ghostManager.reset(true);
     }
 
+    ////////
+    //reset
+    ////////
 
-    //reset lai
     public void nextLevel() {
         // set map
         map.setMap(data.loadMap(pacman, ghostManager, level));
@@ -240,6 +251,9 @@ public class GameController implements Runnable {
         long readyTimer = 0; // dem ready time
         long numberTimer = 0; // dem nguoc..
         long mapColorTimer = 0;
+
+        sound.setFile(Sound.MenuSound.Start);
+        sound.play();
 
         while (view.getReadyTimer() > 0) {
             currentTime = System.nanoTime();
