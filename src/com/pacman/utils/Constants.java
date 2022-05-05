@@ -51,6 +51,4 @@ public interface Constants {
         Wall
     }
 
-    ;
-
 }
